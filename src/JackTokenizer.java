@@ -9,11 +9,15 @@ public class JackTokenizer {
 
     private String token;
 
-    public enum tokenType {
-        KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST
+    private types curr_tokenType;
+
+    private keys curr_keyWord;
+
+    public enum types {
+        KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, STRING
     }
 
-    public enum keyWord {
+    public enum keys {
         CLASS, METHOD, FUNCTION, CONSTRUCTOR, INT, BOOLEAN, CHAR, VOID, VAR, STATIC, FIELD, LET,
         DO, IF, ELSE, WHILE, RETURN, TRUE, FALSE, NULL, THIS
     }
@@ -45,13 +49,92 @@ public class JackTokenizer {
         try {
             char curr_char = (char) rd.read();
 
+            // Symbol Type
             if ("{}()[].,;+-*/&|<>=~".indexOf(curr_char) != -1) {
                 token = "" + curr_char;
+                curr_tokenType = types.SYMBOL;
                 return;
             }
 
+            // Digit Type
             if (Character.isDigit(curr_char)) {
                 token = advanceDigit("" + curr_char);
+                curr_tokenType = types.INT_CONST;
+                return;
+            }
+
+            // Identifier or Keyword
+            if (Character.isLetter(curr_char)) {
+                token = advanceLetter("" + curr_char);
+                curr_tokenType = types.KEYWORD;
+                switch (token) {
+                    case "class":
+                        curr_keyWord = keys.CLASS;
+                        break;
+                    case "constructor":
+                        curr_keyWord = keys.CONSTRUCTOR;
+                        break;
+                    case "function":
+                        curr_keyWord = keys.FUNCTION;
+                        break;
+                    case "method":
+                        curr_keyWord = keys.METHOD;
+                        break;
+                    case "field":
+                        curr_keyWord = keys.FIELD;
+                        break;
+                    case "static":
+                        curr_keyWord = keys.STATIC;
+                        break;
+                    case "var":
+                        curr_keyWord = keys.VAR;
+                        break;
+                    case "int":
+                        curr_keyWord = keys.INT;
+                        break;
+                    case "char":
+                        curr_keyWord = keys.CHAR;
+                        break;
+                    case "boolean":
+                        curr_keyWord = keys.BOOLEAN;
+                        break;
+                    case "void":
+                        curr_keyWord = keys.VOID;
+                        break;
+                    case "true":
+                        curr_keyWord = keys.TRUE;
+                        break;
+                    case "false":
+                        curr_keyWord = keys.FALSE;
+                        break;
+                    case "null":
+                        curr_keyWord = keys.NULL;
+                        break;
+                    case "this":
+                        curr_keyWord = keys.THIS;
+                        break;
+                    case "let":
+                        curr_keyWord = keys.LET;
+                        break;
+                    case "do":
+                        curr_keyWord = keys.DO;
+                        break;
+                    case "if":
+                        curr_keyWord = keys.IF;
+                        break;
+                    case "else":
+                        curr_keyWord = keys.ELSE;
+                        break;
+                    case "while":
+                        curr_keyWord = keys.WHILE;
+                        break;
+                    case "return":
+                        curr_keyWord = keys.RETURN;
+                        break;
+                    default:
+                        curr_tokenType = types.STRING_CONST;
+                        break;
+                }
             }
 
 
@@ -60,12 +143,34 @@ public class JackTokenizer {
         }
     }
 
+    public types tokenType() {
+        return curr_tokenType;
+    }
+
+    public keys keyWord() {
+        return curr_keyWord;
+    }
+
     public String advanceDigit(String num) {
         try {
             char curr_char = (char) rd.read();
             if (Character.isDigit(curr_char)) {
                 return advanceDigit(num + curr_char);
             } else return num;
+        } catch (IOException x) {
+            System.err.println(x);
+            return ("-1");
+        }
+
+
+    }
+
+    public String advanceLetter(String letter) {
+        try {
+            char curr_char = (char) rd.read();
+            if (Character.isLetterOrDigit(curr_char) || curr_char == '_') {
+                return advanceDigit(letter + curr_char);
+            } else return letter;
         } catch (IOException x) {
             System.err.println(x);
             return ("-1");
