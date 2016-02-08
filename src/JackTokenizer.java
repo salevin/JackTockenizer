@@ -45,9 +45,18 @@ public class JackTokenizer {
         }
     }
 
+    /*
+
+     */
     public void advance() {
         try {
             char curr_char = (char) rd.read();
+
+            //Comment
+            if (curr_char == '/') {
+                curr_char = (char) rd.read();
+                advanceComment(curr_char);
+            }
 
             // Symbol Type
             if ("{}()[].,;+-*/&|<>=~".indexOf(curr_char) != -1) {
@@ -71,7 +80,8 @@ public class JackTokenizer {
 
             // String
             if (curr_char == '"') {
-                //TODO Read in token
+                token = "";
+                advanceString(token);
                 curr_tokenType = types.STRING_CONST;
             }
 
@@ -109,6 +119,20 @@ public class JackTokenizer {
         } catch (IOException x) {
             System.err.println(x);
             return ("-1");
+        }
+    }
+
+    public String advanceString(String token){
+        try{
+            char curr_char = (char) rd.read();
+            while(curr_char != '"'){
+                token = token + curr_char;
+                curr_char = (char) rd.read();
+            }
+            return token;
+        } catch (IOException x){
+            System.err.println(x);
+            return("-1");
         }
     }
 
@@ -183,5 +207,33 @@ public class JackTokenizer {
                 break;
         }
 
+    }
+
+    public void advanceComment(char curr_char) {
+        try {
+            if (curr_char == '*') {
+                curr_tokenType = types.COMMENT;
+                curr_char = (char) rd.read();
+                char next_char = (char) rd.read();
+                while (curr_char != '*' && next_char != '/') {
+                    curr_char = next_char;
+                    next_char = (char) rd.read();
+                }
+                return;
+            }
+            else if (curr_char == '/') {
+                curr_tokenType = types.COMMENT;
+                curr_char = (char) rd.read();
+                while (curr_char != '\n') {
+                    curr_char = (char) rd.read();
+                }
+                return;
+            }
+            else {
+                rd.unread(curr_char);
+            }
+        } catch (IOException x) {
+            System.err.println(x);
+        }
     }
 }
