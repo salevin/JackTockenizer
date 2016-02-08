@@ -83,6 +83,7 @@ public class JackTokenizer {
             if (Character.isLetter(curr_char)) {
                 token = advanceLetter("" + curr_char);
                 keyIdSwitch();
+                return;
             }
 
             // String
@@ -90,6 +91,7 @@ public class JackTokenizer {
                 token = "";
                 advanceString(token);
                 curr_tokenType = types.STRING_CONST;
+                return;
             }
 
         } catch (IOException x) {
@@ -121,7 +123,7 @@ public class JackTokenizer {
         try {
             char curr_char = (char) rd.read();
             if (Character.isLetterOrDigit(curr_char) || curr_char == '_') {
-                return advanceDigit(letter + curr_char);
+                return advanceLetter(letter + curr_char);
             } else return letter;
         } catch (IOException x) {
             System.err.println(x);
