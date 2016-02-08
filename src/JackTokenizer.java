@@ -94,6 +94,8 @@ public class JackTokenizer {
                 return;
             }
 
+            advance();
+
         } catch (IOException x) {
             System.err.println(x);
         }
@@ -112,7 +114,10 @@ public class JackTokenizer {
             char curr_char = (char) rd.read();
             if (Character.isDigit(curr_char)) {
                 return advanceDigit(num + curr_char);
-            } else return num;
+            } else {
+                rd.unread(curr_char);
+                return num;
+            }
         } catch (IOException x) {
             System.err.println(x);
             return ("-1");
@@ -124,7 +129,10 @@ public class JackTokenizer {
             char curr_char = (char) rd.read();
             if (Character.isLetterOrDigit(curr_char) || curr_char == '_') {
                 return advanceLetter(letter + curr_char);
-            } else return letter;
+            } else {
+                rd.unread(curr_char);
+                return letter;
+            }
         } catch (IOException x) {
             System.err.println(x);
             return ("-1");
