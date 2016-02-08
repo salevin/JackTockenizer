@@ -54,6 +54,7 @@ public class JackTokenizer {
 
             //Comment
             if (curr_char == '/') {
+                curr_char = (char) rd.read();
                 if (curr_char == '*') {
                     advanceBlock();
                     return;
@@ -62,6 +63,7 @@ public class JackTokenizer {
                     return;
                 } else {
                     rd.unread(curr_char);
+                    curr_char = '/';
                 }
             }
 
