@@ -156,6 +156,10 @@ public class JackTokenizer {
         }
     }
 
+    public String returnToken(){
+        return token;
+    }
+
     public void keyIdSwitch() {
         curr_tokenType = types.KEYWORD;
         switch (token) {

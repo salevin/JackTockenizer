@@ -21,10 +21,24 @@ public class CompilationEngine {
     }
 
     public void compileClass() {
-        while (jToke.hasMoreTokens()) {
-            jToke.advance();
-            writer.write();
-
+        try {
+            writer.write("<tokens>\n");
+            String tokenType;
+            String token;
+            while (jToke.hasMoreTokens()) {
+                jToke.advance();
+                tokenType = jToke.tokenType().toString().toLowerCase();
+                token = jToke.returnToken();
+                if (jToke.tokenType() != JackTokenizer.types.COMMENT){
+                    token = token.replace("<","&lt;");
+                    token = token.replace(">", "&gt;");
+                    token = token.replace("&", "&amp;");
+                    writer.write("<" + tokenType + "> " + token + " </" + tokenType + ">");
+                }
+            }
+            writer.write("</tokens>");
+        } catch (IOException x){
+            System.err.println(x);
         }
     }
 }
