@@ -33,10 +33,12 @@ public class CompilationEngine {
                     token = token.replace("<","&lt;");
                     token = token.replace(">", "&gt;");
                     token = token.replace("&", "&amp;");
-                    writer.write("<" + tokenType + "> " + token + " </" + tokenType + ">");
+                    String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n  ";
+                    writer.write(line);
                 }
             }
             writer.write("</tokens>");
+            writer.close();
         } catch (IOException x){
             System.err.println(x);
         }

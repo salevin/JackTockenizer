@@ -35,10 +35,10 @@ public class JackTokenizer {
     public boolean hasMoreTokens() {
         try {
             int curr_char = rd.read();
-            if (curr_char != -1 && curr_char != ' ') {
+            if (curr_char != -1 && !Character.isWhitespace(curr_char)) {
                 rd.unread(curr_char);
                 return true;
-            } else if (curr_char == ' '){
+            } else if (Character.isWhitespace(curr_char)){
                 return hasMoreTokens();
             }
             else return false;
@@ -96,8 +96,6 @@ public class JackTokenizer {
                 curr_tokenType = types.STRING_CONST;
                 return;
             }
-
-            advance();
 
         } catch (IOException x) {
             System.err.println(x);
@@ -251,11 +249,11 @@ public class JackTokenizer {
     public void advanceBlock() {
         try {
             curr_tokenType = types.COMMENT;
-            char curr_char = (char) rd.read();
-            char next_char = (char) rd.read();
-            while (curr_char != '*' && next_char != '/') {
-                curr_char = next_char;
+            char next_char = ' ';
+            while (true) {
+                char curr_char = next_char;
                 next_char = (char) rd.read();
+                if (curr_char == '*' && next_char == '/') return;
             }
         } catch (IOException x) {
             System.err.println(x);
