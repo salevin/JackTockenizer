@@ -35,10 +35,13 @@ public class JackTokenizer {
     public boolean hasMoreTokens() {
         try {
             int curr_char = rd.read();
-            if (curr_char != -1) {
+            if (curr_char != -1 && curr_char != ' ') {
                 rd.unread(curr_char);
                 return true;
-            } else return false;
+            } else if (curr_char == ' '){
+                return hasMoreTokens();
+            }
+            else return false;
         } catch (IOException x) {
             System.err.println(x);
             return false;
