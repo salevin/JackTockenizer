@@ -36,9 +36,9 @@ public class CompilationEngine {
                     tokenType = "stringConstant";
                 }
                 if (jToke.tokenType() != JackTokenizer.types.COMMENT){
+                    token = token.replace("&", "&amp;");
                     token = token.replace("<","&lt;");
                     token = token.replace(">", "&gt;");
-                    token = token.replace("&", "&amp;");
                     String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
                     writer.write(line);
                 }
