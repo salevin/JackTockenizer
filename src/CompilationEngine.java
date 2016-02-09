@@ -33,7 +33,7 @@ public class CompilationEngine {
                     token = token.replace("<","&lt;");
                     token = token.replace(">", "&gt;");
                     token = token.replace("&", "&amp;");
-                    String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n  ";
+                    String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
                     writer.write(line);
                 }
             }
