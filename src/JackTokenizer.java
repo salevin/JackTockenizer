@@ -45,9 +45,7 @@ public class JackTokenizer {
         }
     }
 
-    /*
 
-     */
     public void advance() {
         try {
             char curr_char = (char) rd.read();

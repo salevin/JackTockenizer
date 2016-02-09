@@ -1,18 +1,30 @@
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
 /**
  * Created by sam on 2/2/16.
  */
 public class CompilationEngine {
+
+    private JackTokenizer jToke;
+    private BufferedWriter writer;
+
     public CompilationEngine(String inputPath, String outputPath) {
-        //TODO
+        jToke = new JackTokenizer(inputPath);
+        try{
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
+        } catch (IOException x) {
+            System.err.println(x);
+        }
     }
 
-    public void compileClass(){
-        //TODO
-        /*
-        The compileClass will contain a single while loop which loops while the tokenizer
-        has more tokens and writes the results from the tokenizer to the output file.
-        Since the argument to your code can be either a .jack file or a directory containing
-        multiple .jack files, the following main program will deal with those two cases.
-         */
+    public void compileClass() {
+        while (jToke.hasMoreTokens()) {
+            jToke.advance();
+            writer.write();
+
+        }
     }
 }
