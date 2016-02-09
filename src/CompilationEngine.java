@@ -31,11 +31,17 @@ public class CompilationEngine {
                 jToke.advance();
                 tokenType = jToke.tokenType().toString().toLowerCase();
                 token = jToke.returnToken();
+                if (tokenType.equals("int_const")){
+                    tokenType = "integerConstant";
+                }
+                if (tokenType.equals("string_const")){
+                    tokenType = "stringConstant";
+                }
                 if (jToke.tokenType() != JackTokenizer.types.COMMENT){
+                    token = token.replace("&", "&amp;");
                     token = token.replace("<","&lt;");
                     token = token.replace(">", "&gt;");
-                    token = token.replace("&", "&amp;");
-                    String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n  ";
+                    String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
                     writer.write(line);
                 }
             }
