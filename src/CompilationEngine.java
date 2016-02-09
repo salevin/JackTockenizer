@@ -29,6 +29,12 @@ public class CompilationEngine {
                 jToke.advance();
                 tokenType = jToke.tokenType().toString().toLowerCase();
                 token = jToke.returnToken();
+                if (tokenType.equals("int_const")){
+                    tokenType = "integerConstant";
+                }
+                if (tokenType.equals("string_const")){
+                    tokenType = "stringConstant";
+                }
                 if (jToke.tokenType() != JackTokenizer.types.COMMENT){
                     token = token.replace("<","&lt;");
                     token = token.replace(">", "&gt;");
