@@ -29,6 +29,12 @@ public class CompilationEngine {
             String token;
             while (jToke.hasMoreTokens()) {
                 jToke.advance();
+
+                if (jToke.keyWord() == JackTokenizer.keys.VAR){
+                    compileVarDec();
+                }
+                //else if
+
                 tokenType = jToke.tokenType().toString().toLowerCase();
                 token = jToke.returnToken();
                 if (tokenType.equals("int_const")){
@@ -44,6 +50,8 @@ public class CompilationEngine {
                     String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
                     writer.write(line);
                 }
+
+
             }
             writer.write("</tokens>");
             writer.close();
@@ -53,8 +61,8 @@ public class CompilationEngine {
     }
 
     public void compileClassVarDec(){
-        //TODO
-        //Compiles a static declaration or a field declaration.
+        //TODO Compiles a static declaration or a field declaration
+
     }
 
     public void compileSubroutine(){
@@ -68,7 +76,22 @@ public class CompilationEngine {
     }
 
     public void compileVarDec(){
-        // TODO Compiles a var declaration.
+        try {
+            writer.write("<varDec>\n");
+            writer.write("<keyword> var </keyword>\n");
+            String tokenType;
+            String token ="";
+            while (!token.equals(";")) {
+                jToke.advance();
+                tokenType = jToke.tokenType().toString().toLowerCase();
+                token = jToke.returnToken();
+                String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
+                writer.write(line);
+            }
+            writer.write("</varDec>");
+        } catch (IOException x){
+            System.err.println(x);
+        }
     }
 
     public void compileStatements(){
