@@ -1,4 +1,5 @@
 import com.sun.xml.internal.bind.v2.TODO;
+import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -61,8 +62,17 @@ public class CompilationEngine {
     }
 
     public void compileClassVarDec(){
-        //TODO Compiles a static declaration or a field declaration
-
+        try {
+            writer.write("<classVarDec>\n");
+            writeCurrToke();
+            while (!currToke().equals(";")) {
+                jToke.advance();
+                writeCurrToke();
+            }
+            writer.write("</classVarDec>");
+        } catch (IOException x){
+            System.err.println(x);
+        }
     }
 
     public void compileSubroutine(){
@@ -79,14 +89,9 @@ public class CompilationEngine {
         try {
             writer.write("<varDec>\n");
             writer.write("<keyword> var </keyword>\n");
-            String tokenType;
-            String token ="";
-            while (!token.equals(";")) {
+            while (!currToke().equals(";")) {
                 jToke.advance();
-                tokenType = jToke.tokenType().toString().toLowerCase();
-                token = jToke.returnToken();
-                String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
-                writer.write(line);
+                writeCurrToke();
             }
             writer.write("</varDec>");
         } catch (IOException x){
@@ -137,6 +142,39 @@ public class CompilationEngine {
     public void compileExpressionList(){
         // TODO
         //Compiles a (possibly empty) comma-separated list of expressions.
+    }
+
+    private void writeCurrToke(){
+        try {
+            String tokenType = currTokeType();
+
+            String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
+            writer.write(line);
+        } catch (IOException e){
+            System.err.println(e);
+        }
+    }
+
+    private String currTokeType(){
+        String tokenType = jToke.tokenType().toString().toLowerCase();
+
+        if (tokenType.equals("int_const")){
+            tokenType = "integerConstant";
+        }
+        if (tokenType.equals("string_const")){
+            tokenType = "stringConstant";
+        }
+        return tokenType;
+    }
+
+    private String currToke(){
+        String token = jToke.returnToken();
+
+        token = token.replace("&", "&amp;");
+        token = token.replace("<","&lt;");
+        token = token.replace(">", "&gt;");
+
+        return token;
     }
 
 
