@@ -25,36 +25,61 @@ public class CompilationEngine {
 
     public void compileClass() {
         try {
-            writer.write("<tokens>\n");
-            String tokenType;
-            String token;
-            while (jToke.hasMoreTokens()) {
+            writer.write("<class>\n");
+            JackTokenizer.keys key;
+
+            jToke.advance();
+            key = jToke.keyWord();
+
+            if (key == JackTokenizer.keys.CLASS){
+                writeCurrToke();
+            }
+            else{
+                System.err.println("No class dec!");
+                return;
+            }
+
+            jToke.advance();
+
+            if (currToke().equals("{")){
+                writeCurrToke();
+            }
+            else{
+                System.err.println("incorrect format!");
+                return;
+            }
+
+            jToke.advance();
+            key = jToke.keyWord();
+
+
+            while (key == JackTokenizer.keys.STATIC
+                    || key == JackTokenizer.keys.FIELD) {
+
+                compileClassVarDec();
+
                 jToke.advance();
+                key = jToke.keyWord();
+            }
 
-                if (jToke.keyWord() == JackTokenizer.keys.VAR){
-                    compileVarDec();
-                }
-                //else if
+            while (key == JackTokenizer.keys.CONSTRUCTOR
+                    || key == JackTokenizer.keys.FUNCTION
+                    || key == JackTokenizer.keys.METHOD){
 
-                tokenType = jToke.tokenType().toString().toLowerCase();
-                token = jToke.returnToken();
-                if (tokenType.equals("int_const")){
-                    tokenType = "integerConstant";
-                }
-                if (tokenType.equals("string_const")){
-                    tokenType = "stringConstant";
-                }
-                if (jToke.tokenType() != JackTokenizer.types.COMMENT){
-                    token = token.replace("&", "&amp;");
-                    token = token.replace("<","&lt;");
-                    token = token.replace(">", "&gt;");
-                    String line = "<" + tokenType + "> " + token + " </" + tokenType + ">\n";
-                    writer.write(line);
-                }
+                compileSubroutineDec();
 
+                jToke.advance();
+                key = jToke.keyWord();
+            }
+
+            if (currToke().equals("}")){
+                writeCurrToke();
+                writer.write("</class>\n");
 
             }
-            writer.write("</tokens>");
+            else{
+                System.err.println("incorrect format!");
+            }
             writer.close();
         } catch (IOException x){
             System.err.println(x);
@@ -65,19 +90,94 @@ public class CompilationEngine {
         try {
             writer.write("<classVarDec>\n");
             writeCurrToke();
-            while (!currToke().equals(";")) {
-                jToke.advance();
-                writeCurrToke();
+            jToke.advance();
+
+            if (jToke.keyWord() != JackTokenizer.keys.INT
+                    && jToke.keyWord() != JackTokenizer.keys.CHAR
+                    && jToke.keyWord() != JackTokenizer.keys.BOOLEAN
+                    && jToke.tokenType() != JackTokenizer.types.IDENTIFIER
+                    && jToke.keyWord() != JackTokenizer.keys.VOID){
+
+                System.err.println("incorrect format!");
+                return;
             }
+
+            writeCurrToke();
+            jToke.advance();
+
+            if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                System.err.println("incorrect format!");
+                return;
+            }
+
+            writeCurrToke();
+            jToke.advance();
+
+            if (!currToke().equals("{")){
+                System.err.println("incorrect format!");
+                return;
+            }
+
+            writeCurrToke();
+            jToke.advance();
+
             writer.write("</classVarDec>");
         } catch (IOException x){
             System.err.println(x);
         }
     }
 
-    public void compileSubroutine(){
-        //TODO
-        //Compiles a complete method,function, or constructor.
+    public void compileSubroutineDec(){
+        try {
+            writer.write("<subroutineDec>\n");
+            writeCurrToke();
+            jToke.advance();
+
+            if (jToke.keyWord() != JackTokenizer.keys.VOID
+                    && jToke.keyWord() != JackTokenizer.keys.CHAR
+                    && jToke.keyWord() != JackTokenizer.keys.BOOLEAN
+                    && jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+
+                System.err.println("incorrect format!");
+                return;
+            }
+
+            writeCurrToke();
+            jToke.advance();
+
+            if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                System.err.println("incorrect format!");
+                return;
+            }
+
+            writeCurrToke();
+            jToke.advance();
+
+            while (!currToke().equals(";")) {
+                if (!currToke().equals(",")){
+                    System.err.println("incorrect format!");
+                    return;
+                }
+                writeCurrToke();
+                jToke.advance();
+                if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                    System.err.println("incorrect format!");
+                    return;
+                }
+                writeCurrToke();
+                jToke.advance();
+            }
+            writeCurrToke();
+
+
+            writer.write("</subroutineDec>");
+        } catch (IOException x){
+            System.err.println(x);
+        }
+    }
+
+    public void compileSubroutineBody(){
+        //TODO Compiles a complete method,function, or constructor.
     }
 
     public void compileParameterList(){
