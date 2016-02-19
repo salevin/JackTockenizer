@@ -1,3 +1,4 @@
+import com.sun.java.util.jar.pack.Instruction;
 import com.sun.xml.internal.bind.v2.TODO;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
@@ -270,7 +271,26 @@ public class CompilationEngine {
     }
 
     public void compileStatements(){
-        // TODO Compiles a sequence of statements, not including the enclosing ‘‘{}’’.
+        switch (currToke()){
+            case "let":
+                compileLet();
+                break;
+            case "if":
+                compileIf();
+                break;
+            case "while":
+                compileWhile();
+                break;
+            case "do":
+                compileDo();
+                break;
+            case "return":
+                compileReturn();
+                break;
+            default:
+                err.println("incorrect format! in compileStatements()");
+                exit(0);
+        }
     }
 
     public void compileDo(){
@@ -278,7 +298,42 @@ public class CompilationEngine {
     }
 
     public void compileLet(){
-        // TODO compiles a let statement
+        try {
+            writer.write("<letStatement>\n");
+            if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            writer.write(currToke();
+            jToke.advance();
+
+            if(currToke() == "["){
+                writer.write(currToke());
+                compileExpression();
+                writer.write(currToke());
+            }
+            else if(currToke() == "="){
+                writer.write(currToke());
+            }
+            else{
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            compileExpression();
+            if(currToke() == ";"){
+                writer.write(currToke());
+            }
+            else{
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+
+            writer.write("</letStatement>");
+
+        } catch (IOException x){
+            err.println(x);
+        }
+
     }
 
     public void compileWhile(){
@@ -290,7 +345,62 @@ public class CompilationEngine {
     }
 
     public void compileIf(){
-        // TODO
+        try {
+            writer.write("<ifStatement>\n");
+            if(currToke() != "("){
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            writer.write(currToke());
+            jToke.advance();
+            compileExpression();
+            if(currToke() != ")") {
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            writer.write(currToke());
+            jToke.advance();
+            if(currToke() != "{") {
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            writer.write(currToke());
+            jToke.advance();
+
+
+            if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            writer.write(currToke();
+            jToke.advance();
+
+            if(currToke() == "["){
+                writer.write(currToke());
+                compileExpression();
+                writer.write(currToke());
+            }
+            else if(currToke() == "="){
+                writer.write(currToke());
+            }
+            else{
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+            compileExpression();
+            if(currToke() == ";"){
+                writer.write(currToke());
+            }
+            else{
+                err.println("incorrect format! in compileLet()");
+                exit(0);
+            }
+
+            writer.write("</letStatement>");
+
+        } catch (IOException x){
+            err.println(x);
+        }
     }
 
     public void compileExpression(){
