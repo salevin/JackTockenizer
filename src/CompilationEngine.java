@@ -1,4 +1,4 @@
-import com.sun.java.util.jar.pack.Instruction;
+//import com.sun.java.util.jar.pack.Instruction;
 import com.sun.xml.internal.bind.v2.TODO;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Objects;
 
 import static java.lang.System.*;
 
@@ -294,34 +295,56 @@ public class CompilationEngine {
     }
 
     public void compileDo(){
-        // TODO compiles a do statement
+        try {
+            writer.write("<doStatement>\n");
+            writeCurrToke();
+
+            compileSubroutineCall();
+
+            if(!currToke().equals(";")){
+                err.println("incorrect format! in compileDo()");
+                exit(0);
+            }
+            writeCurrToke();
+
+            writer.write("</doStatement>");
+
+            jToke.advance();
+
+        } catch (IOException x){
+            err.println(x);
+        }
+
+
     }
 
     public void compileLet(){
         try {
             writer.write("<letStatement>\n");
+            writeCurrToke();
+
             if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke();
+            writeCurrToke();
             jToke.advance();
 
-            if(currToke() == "["){
-                writer.write(currToke());
+            if(currToke().equals("[")){
+                writeCurrToke();
                 compileExpression();
-                writer.write(currToke());
+                writeCurrToke();
             }
-            else if(currToke() == "="){
-                writer.write(currToke());
+            else if(currToke().equals("=")){
+                writeCurrToke();
             }
             else{
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
             compileExpression();
-            if(currToke() == ";"){
-                writer.write(currToke());
+            if(currToke().equals(";")){
+                writeCurrToke();
             }
             else{
                 err.println("incorrect format! in compileLet()");
@@ -329,6 +352,7 @@ public class CompilationEngine {
             }
 
             writer.write("</letStatement>");
+            jToke.advance();
 
         } catch (IOException x){
             err.println(x);
@@ -337,67 +361,110 @@ public class CompilationEngine {
     }
 
     public void compileWhile(){
-        // TODO
+        try {
+            writer.write("<whileStatement>\n");
+            writeCurrToke();
+
+            if(!currToke().equals("(")){
+                err.println("incorrect format! in compileWhile()");
+                exit(0);
+            }
+            writeCurrToke();
+            jToke.advance();
+            compileExpression();
+            if(!currToke().equals(")")) {
+                err.println("incorrect format! in compileWhile()");
+                exit(0);
+            }
+            writeCurrToke();
+            jToke.advance();
+            if(!Objects.equals(currToke(), "{")) {
+                err.println("incorrect format! in compileWhile()");
+                exit(0);
+            }
+            writeCurrToke();
+
+            jToke.advance();
+
+            compileStatements();
+
+            writeCurrToke();
+            writer.write("</whileStatement>\n");
+
+            jToke.advance();
+
+        } catch (IOException x) {
+            err.println(x);
+        }
     }
 
     public void compileReturn(){
-        // TODO
+        try {
+            writer.write("<returnStatement>");
+            writeCurrToke();
+            jToke.advance();
+
+            if(!currToke().equals(";")){
+                compileExpression();
+            }
+
+            writeCurrToke();
+            writer.write("</returnStatement>");
+        } catch (IOException x) {
+            err.println(x);
+        }
     }
 
     public void compileIf(){
         try {
             writer.write("<ifStatement>\n");
-            if(currToke() != "("){
+            writeCurrToke();
+
+            if(!currToke().equals("(")){
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke());
+            writeCurrToke();
             jToke.advance();
             compileExpression();
-            if(currToke() != ")") {
+            if(!currToke().equals(")")) {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke());
+            writeCurrToke();
             jToke.advance();
-            if(currToke() != "{") {
+            if(!Objects.equals(currToke(), "{")) {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke());
-            jToke.advance();
+            writeCurrToke();
 
-
-            if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
-                err.println("incorrect format! in compileLet()");
-                exit(0);
-            }
-            writer.write(currToke();
             jToke.advance();
 
-            if(currToke() == "["){
-                writer.write(currToke());
-                compileExpression();
-                writer.write(currToke());
-            }
-            else if(currToke() == "="){
-                writer.write(currToke());
-            }
-            else{
-                err.println("incorrect format! in compileLet()");
-                exit(0);
-            }
-            compileExpression();
-            if(currToke() == ";"){
-                writer.write(currToke());
-            }
-            else{
-                err.println("incorrect format! in compileLet()");
-                exit(0);
-            }
+            compileStatements();
 
-            writer.write("</letStatement>");
+            writeCurrToke();
+            writer.write("</ifStatement>\n");
 
+            jToke.advance();
+
+            if(currToke().equals("else")) {
+                writer.write("<elseStatement>\n");
+                writeCurrToke();
+
+                if (!currToke().equals("{")) {
+                    err.println("incorrect format! in compileLet()");
+                    exit(0);
+                }
+                writeCurrToke();
+                jToke.advance();
+                compileStatements();
+
+                writeCurrToke();
+                writer.write("</elseStatement>\n");
+
+                jToke.advance();
+            }
         } catch (IOException x){
             err.println(x);
         }
@@ -417,6 +484,10 @@ public class CompilationEngine {
         of ‘‘[’’, ‘‘(’’, or ‘‘.’’ suffices to distinguish between the three possi-
         bilities. Any other token is not part of this term and should not
         be advanced over.*/
+    }
+
+    private void compileSubroutineCall(){
+        //TODO
     }
 
     public void compileExpressionList(){
