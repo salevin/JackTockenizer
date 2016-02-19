@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import static java.lang.System.*;
+
 /**
  * Created by sam on 2/2/16.
  */
@@ -19,7 +21,7 @@ public class CompilationEngine {
         try{
         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
         } catch (IOException x) {
-            System.err.println(x);
+            err.println(x);
         }
     }
 
@@ -35,8 +37,8 @@ public class CompilationEngine {
                 writeCurrToke();
             }
             else{
-                System.err.println("No class dec!");
-                return;
+                err.println("No class dec!");
+                exit(0);
             }
 
             jToke.advance();
@@ -45,8 +47,8 @@ public class CompilationEngine {
                 writeCurrToke();
             }
             else{
-                System.err.println("incorrect format!");
-                return;
+                err.println("incorrect format!");
+                exit(0);
             }
 
             jToke.advance();
@@ -74,15 +76,16 @@ public class CompilationEngine {
 
             if (currToke().equals("}")){
                 writeCurrToke();
-                writer.write("</class>\n");
+                writer.write("</class>");
 
             }
             else{
-                System.err.println("incorrect format!");
+                err.println("incorrect format!");
+                exit(0);
             }
             writer.close();
         } catch (IOException x){
-            System.err.println(x);
+            err.println(x);
         }
     }
 
@@ -95,35 +98,31 @@ public class CompilationEngine {
             if (jToke.keyWord() != JackTokenizer.keys.INT
                     && jToke.keyWord() != JackTokenizer.keys.CHAR
                     && jToke.keyWord() != JackTokenizer.keys.BOOLEAN
-                    && jToke.tokenType() != JackTokenizer.types.IDENTIFIER
-                    && jToke.keyWord() != JackTokenizer.keys.VOID){
+                    && jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
 
-                System.err.println("incorrect format!");
-                return;
+                err.println("incorrect format!");
+                exit(0);
             }
 
             writeCurrToke();
             jToke.advance();
 
             if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
-                System.err.println("incorrect format!");
-                return;
+                err.println("incorrect format!");
+                exit(0);
             }
 
             writeCurrToke();
             jToke.advance();
 
-            if (!currToke().equals("{")){
-                System.err.println("incorrect format!");
-                return;
-            }
+            writeLoop();
 
             writeCurrToke();
-            jToke.advance();
 
-            writer.write("</classVarDec>");
+
+            writer.write("</classVarDec>\n");
         } catch (IOException x){
-            System.err.println(x);
+            err.println(x);
         }
     }
 
@@ -133,12 +132,13 @@ public class CompilationEngine {
             writeCurrToke();
             jToke.advance();
 
-            if (jToke.keyWord() != JackTokenizer.keys.VOID
+            if (jToke.keyWord() != JackTokenizer.keys.INT
                     && jToke.keyWord() != JackTokenizer.keys.CHAR
                     && jToke.keyWord() != JackTokenizer.keys.BOOLEAN
-                    && jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                    && jToke.tokenType() != JackTokenizer.types.IDENTIFIER
+                    && jToke.keyWord() != JackTokenizer.keys.VOID){
 
-                System.err.println("incorrect format!");
+                err.println("incorrect format!");
                 return;
             }
 
@@ -146,56 +146,126 @@ public class CompilationEngine {
             jToke.advance();
 
             if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
-                System.err.println("incorrect format!");
-                return;
+                err.println("incorrect format!");
+                exit(0);
             }
 
             writeCurrToke();
             jToke.advance();
 
-            while (!currToke().equals(";")) {
-                if (!currToke().equals(",")){
-                    System.err.println("incorrect format!");
-                    return;
-                }
-                writeCurrToke();
-                jToke.advance();
-                if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
-                    System.err.println("incorrect format!");
-                    return;
-                }
-                writeCurrToke();
-                jToke.advance();
+            if (!currToke().equals("(")){
+                err.println("incorrect format!");
+                exit(0);
             }
+
             writeCurrToke();
+            jToke.advance();
+
+            compileParameterList();
+
+            writeCurrToke();
+            jToke.advance();
+
+            if (!currToke().equals("{")){
+                err.println("incorrect format!");
+                exit(0);
+            }
+
+            compileSubroutineBody();
 
 
-            writer.write("</subroutineDec>");
+            writer.write("</subroutineDec>\n");
         } catch (IOException x){
-            System.err.println(x);
+            err.println(x);
         }
     }
 
     public void compileSubroutineBody(){
-        //TODO Compiles a complete method,function, or constructor.
-    }
+        try {
+            writer.write("<subroutineBody>\n");
+            writeCurrToke();
+            jToke.advance();
+
+            while (jToke.tokenType() == JackTokenizer.types.KEYWORD
+            && jToke.keyWord() == JackTokenizer.keys.VAR){
+                compileVarDec();
+            }
+
+
+            while (jToke.tokenType() == JackTokenizer.types.KEYWORD &&
+                    (jToke.keyWord() == JackTokenizer.keys.IF
+                    || jToke.keyWord() == JackTokenizer.keys.DO
+                    || jToke.keyWord() == JackTokenizer.keys.ELSE
+                    || jToke.keyWord() == JackTokenizer.keys.WHILE
+                    || jToke.keyWord() == JackTokenizer.keys.RETURN
+                    || jToke.keyWord() == JackTokenizer.keys.LET)){
+                compileStatements();
+            }
+
+            if (!currToke().equals("}")){
+                err.println("incorrect format!");
+                exit(0);
+            }
+
+            writeCurrToke();
+            jToke.advance();
+
+            writer.write("</subroutineBody>\n");
+        } catch (IOException x){
+            err.println(x);
+        }    }
 
     public void compileParameterList(){
-        //TODO
-        //Compiles a (possibly empty) parameter list, not including the enclosing ‘‘ () ’’.
+        try {
+            writer.write("</parameterList>");
+            if (!currToke().equals(")")) {
+                if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
+                    err.println("incorrect format!");
+                    exit(0);
+                }
+                writeCurrToke();
+                jToke.advance();
+                while (!currToke().equals(")")){
+                    if (!currToke().equals(",")){
+                        err.println("incorrect format!");
+                        exit(0);
+                    }
+                    writeCurrToke();
+                    jToke.advance();
+                    if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                        err.println("incorrect format!");
+                        exit(0);
+                    }
+                    writeCurrToke();
+                    jToke.advance();
+                }
+
+            }
+
+            writer.write("</parameterList>\n");
+
+        }
+        catch (IOException x){
+            err.println(x);
+        }
     }
 
     public void compileVarDec(){
         try {
             writer.write("<varDec>\n");
             writer.write("<keyword> var </keyword>\n");
-            while (!currToke().equals(";")) {
-                jToke.advance();
-                writeCurrToke();
+            writeCurrToke();
+            jToke.advance();
+            if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                err.println("incorrect format!");
+                exit(0);
             }
+            writeCurrToke();
+            jToke.advance();
+            writeLoop();
             writer.write("</varDec>");
         } catch (IOException x){
-            System.err.println(x);
+            err.println(x);
         }
     }
 
@@ -251,7 +321,7 @@ public class CompilationEngine {
             String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
             writer.write(line);
         } catch (IOException e){
-            System.err.println(e);
+            err.println(e);
         }
     }
 
@@ -275,6 +345,23 @@ public class CompilationEngine {
         token = token.replace(">", "&gt;");
 
         return token;
+    }
+
+    private void writeLoop(){
+        while (!currToke().equals(";")) {
+            if (!currToke().equals(",")){
+                err.println("incorrect format!");
+                exit(0);
+            }
+            writeCurrToke();
+            jToke.advance();
+            if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
+                err.println("incorrect format!");
+                exit(0);
+            }
+            writeCurrToke();
+            jToke.advance();
+        }
     }
 
 
