@@ -273,7 +273,7 @@ public class CompilationEngine {
             writeCurrToke();
             realAdvance();
             writeLoop();
-            writer.write("</varDec>");
+            writer.write("</varDec>\n");
         } catch (IOException x){
             err.println(x);
         }
@@ -313,31 +313,31 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke();
+            writeCurrToke();
             jToke.advance();
 
-            if(currToke() == "["){
-                writer.write(currToke());
+            if(currToke().equals("[")){
+                writeCurrToke();
                 compileExpression();
-                writer.write(currToke());
+                writeCurrToke();
             }
-            else if(currToke() == "="){
-                writer.write(currToke());
+            else if(currToke().equals("=")){
+                writeCurrToke();
             }
             else{
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
             compileExpression();
-            if(currToke() == ";"){
-                writer.write(currToke());
+            if(currToke().equals(";")){
+                writeCurrToke();
             }
             else{
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
 
-            writer.write("</letStatement>");
+            writer.write("</letStatement>\n");
 
         } catch (IOException x){
             err.println(x);
@@ -356,24 +356,24 @@ public class CompilationEngine {
     public void compileIf(){
         try {
             writer.write("<ifStatement>\n");
-            if(currToke() != "("){
+            if(!currToke().equals("(")){
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke());
+            writeCurrToke();
             jToke.advance();
             compileExpression();
-            if(currToke() != ")") {
+            if(!currToke().equals(")")) {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke());
+            writeCurrToke();
             jToke.advance();
-            if(currToke() != "{") {
+            if(currToke().equals("{")) {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke());
+            writeCurrToke();
             jToke.advance();
 
 
@@ -381,24 +381,24 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
-            writer.write(currToke();
+            writeCurrToke();
             jToke.advance();
 
-            if(currToke() == "["){
-                writer.write(currToke());
+            if(currToke().equals("[")){
+                writeCurrToke();
                 compileExpression();
-                writer.write(currToke());
+                writeCurrToke();
             }
-            else if(currToke() == "="){
-                writer.write(currToke());
+            else if(currToke().equals("=")){
+                writeCurrToke();
             }
             else{
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
             compileExpression();
-            if(currToke() == ";"){
-                writer.write(currToke());
+            if(currToke().equals(";")){
+                writeCurrToke();
             }
             else{
                 err.println("incorrect format! in compileLet()");
