@@ -304,7 +304,27 @@ public class CompilationEngine {
     }
 
     public void compileDo(){
-        // TODO compiles a do statement
+        try {
+            writer.write("<doStatement>\n");
+            writeCurrToke();
+
+            compileSubroutineCall();
+
+            if(!currToke().equals(";")){
+                err.println("incorrect format! in compileDo()");
+                exit(0);
+            }
+            writeCurrToke();
+
+            writer.write("</doStatement>");
+
+            jToke.advance();
+
+        } catch (IOException x){
+            err.println(x);
+        }
+
+
     }
 
     public void compileLet(){
@@ -342,7 +362,8 @@ public class CompilationEngine {
                 exit(0);
             }
 
-            writer.write("</letStatement>\n");
+            writer.write("</letStatement>");
+            jToke.advance();
 
         } catch (IOException x){
             err.println(x);
@@ -351,11 +372,58 @@ public class CompilationEngine {
     }
 
     public void compileWhile(){
-        // TODO
+        try {
+            writer.write("<whileStatement>\n");
+            writeCurrToke();
+
+            if(!currToke().equals("(")){
+                err.println("incorrect format! in compileWhile()");
+                exit(0);
+            }
+            writeCurrToke();
+            jToke.advance();
+            compileExpression();
+            if(!currToke().equals(")")) {
+                err.println("incorrect format! in compileWhile()");
+                exit(0);
+            }
+            writeCurrToke();
+            jToke.advance();
+            if(!currToke().equals("{")) {
+                err.println("incorrect format! in compileWhile()");
+                exit(0);
+            }
+            writeCurrToke();
+
+            jToke.advance();
+
+            compileStatements();
+
+            writeCurrToke();
+            writer.write("</whileStatement>\n");
+
+            jToke.advance();
+
+        } catch (IOException x) {
+            err.println(x);
+        }
     }
 
     public void compileReturn(){
-        // TODO
+        try {
+            writer.write("<returnStatement>");
+            writeCurrToke();
+            jToke.advance();
+
+            if(!currToke().equals(";")){
+                compileExpression();
+            }
+
+            writeCurrToke();
+            writer.write("</returnStatement>");
+        } catch (IOException x) {
+            err.println(x);
+        }
     }
 
     public void compileIf(){
@@ -431,6 +499,10 @@ public class CompilationEngine {
         of ‘‘[’’, ‘‘(’’, or ‘‘.’’ suffices to distinguish between the three possi-
         bilities. Any other token is not part of this term and should not
         be advanced over.*/
+    }
+
+    private void compileSubroutineCall(){
+        //TODO
     }
 
     public void compileExpressionList(){
