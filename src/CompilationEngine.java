@@ -319,7 +319,7 @@ public class CompilationEngine {
                 exit(0);
             }
             writeCurrToke();
-            jToke.advance();
+            realAdvance();
 
             if(currToke().equals("[")){
                 writeCurrToke();
@@ -366,20 +366,20 @@ public class CompilationEngine {
                 exit(0);
             }
             writeCurrToke();
-            jToke.advance();
+            realAdvance();
             compileExpression();
             if(!currToke().equals(")")) {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
             writeCurrToke();
-            jToke.advance();
+            realAdvance();
             if(currToke().equals("{")) {
                 err.println("incorrect format! in compileLet()");
                 exit(0);
             }
             writeCurrToke();
-            jToke.advance();
+            realAdvance();
 
 
             if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
@@ -387,7 +387,7 @@ public class CompilationEngine {
                 exit(0);
             }
             writeCurrToke();
-            jToke.advance();
+            realAdvance();
 
             if(currToke().equals("[")){
                 writeCurrToke();
