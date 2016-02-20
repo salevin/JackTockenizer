@@ -1,4 +1,5 @@
 import com.sun.xml.internal.bind.v2.TODO;
+import com.sun.xml.internal.fastinfoset.sax.SystemIdResolver;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import java.io.BufferedWriter;
@@ -309,6 +310,10 @@ public class CompilationEngine {
     public void compileLet(){
         try {
             writer.write("<letStatement>\n");
+
+            writeCurrToke();
+            realAdvance();
+
             if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
                 err.println("incorrect format! in compileLet()");
                 exit(0);
@@ -438,6 +443,7 @@ public class CompilationEngine {
             String tokenType = currTokeType();
 
             String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
+            System.out.print(line);
             writer.write(line);
         } catch (IOException e){
             err.println(e);
