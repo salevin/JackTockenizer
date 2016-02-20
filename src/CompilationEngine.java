@@ -430,20 +430,20 @@ public class CompilationEngine {
         try {
             writer.write("<ifStatement>\n");
             if(!currToke().equals("(")){
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileIf()");
                 exit(0);
             }
             writeCurrToke();
             realAdvance();
             compileExpression();
             if(!currToke().equals(")")) {
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileIf()");
                 exit(0);
             }
             writeCurrToke();
             realAdvance();
             if(currToke().equals("{")) {
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileIf()");
                 exit(0);
             }
             writeCurrToke();
@@ -451,7 +451,7 @@ public class CompilationEngine {
 
 
             if(jToke.tokenType() != JackTokenizer.types.IDENTIFIER){
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileIf()");
                 exit(0);
             }
             writeCurrToke();
@@ -459,6 +459,7 @@ public class CompilationEngine {
 
             if(currToke().equals("[")){
                 writeCurrToke();
+                realAdvance();
                 compileExpression();
                 writeCurrToke();
             }
@@ -466,15 +467,18 @@ public class CompilationEngine {
                 writeCurrToke();
             }
             else{
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileIf()");
                 exit(0);
             }
+
+            realAdvance();
             compileExpression();
+
             if(currToke().equals(";")){
                 writeCurrToke();
             }
             else{
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileIf()");
                 exit(0);
             }
 
@@ -486,19 +490,69 @@ public class CompilationEngine {
     }
 
     public void compileExpression(){
-        // TODO
+        try {
+            writer.write("<expression>\n");
+
+            compileTerm();
+
+            while("+-*/&|<>=".contains(jToke.returnToken())){
+                writeCurrToke();
+                compileTerm();
+            }
+
+
+            writer.write("</expression>");
+
+        } catch (IOException x){
+            err.println(x);
+        }
     }
 
     public void compileTerm(){
-        // TODO
-        /*Compiles a term. This routine is faced with a slight difficulty
-        when trying to decide between some of the alternative parsing
-        rules. Specifically, if the current token is an identifier, the routine
-        must distinguish between a variable, an array entry, and a
-        subroutine call. A single look- ahead token, which may be one
-        of ‘‘[’’, ‘‘(’’, or ‘‘.’’ suffices to distinguish between the three possi-
-        bilities. Any other token is not part of this term and should not
-        be advanced over.*/
+        switch (currToke()){
+            case "(":
+                writeCurrToke();
+                realAdvance();
+                compileExpression();
+                if(!currToke().equals(")")){
+                    err.println("incorrect format! in compileTerm()");
+                    exit(0);
+                }
+                writeCurrToke();
+                realAdvance();
+                break;
+            case "-":
+            case "~":
+                writeCurrToke();
+                realAdvance();
+                compileTerm();
+                break;
+            default:
+                switch (jToke.tokenType()){
+                    case KEYWORD:
+                        if(jToke.keyWord() != JackTokenizer.keys.TRUE
+                                && jToke.keyWord() != JackTokenizer.keys.FALSE
+                                && jToke.keyWord() != JackTokenizer.keys.NULL
+                                && jToke.keyWord() != JackTokenizer.keys.THIS){
+                            err.println("incorrect format! in compileTerm()");
+                            exit(0);
+                        }
+                        writeCurrToke();
+                        realAdvance();
+                        break;
+                    case INT_CONST:
+                        writeCurrToke();
+                        realAdvance();
+                        break;
+                    case STRING_CONST:
+                        writeCurrToke();
+                        realAdvance();
+                        break;
+                    case IDENTIFIER:
+                        //TODO the confusing part
+                }
+                break;
+        }
     }
 
     private void compileSubroutineCall(){
