@@ -16,6 +16,7 @@ public class CompilationEngine {
 
     private JackTokenizer jToke;
     private BufferedWriter writer;
+    private String savedToken;
 
     public CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
@@ -307,8 +308,9 @@ public class CompilationEngine {
         try {
             writer.write("<doStatement>\n");
             writeCurrToke();
+            realAdvance();
 
-            compileSubroutineCall();
+            compileSubroutineCall(false);
 
             if(!currToke().equals(";")){
                 err.println("incorrect format! in compileDo()");
@@ -513,54 +515,91 @@ public class CompilationEngine {
     }
 
     public void compileTerm(){
-        switch (currToke()){
-            case "(":
-                writeCurrToke();
-                realAdvance();
-                compileExpression();
-                if(!currToke().equals(")")){
-                    err.println("incorrect format! in compileTerm()");
-                    exit(0);
-                }
-                writeCurrToke();
-                realAdvance();
-                break;
-            case "-":
-            case "~":
-                writeCurrToke();
-                realAdvance();
-                compileTerm();
-                break;
-            default:
-                switch (jToke.tokenType()){
-                    case KEYWORD:
-                        if(jToke.keyWord() != JackTokenizer.keys.TRUE
-                                && jToke.keyWord() != JackTokenizer.keys.FALSE
-                                && jToke.keyWord() != JackTokenizer.keys.NULL
-                                && jToke.keyWord() != JackTokenizer.keys.THIS){
-                            err.println("incorrect format! in compileTerm()");
-                            exit(0);
-                        }
-                        writeCurrToke();
-                        realAdvance();
-                        break;
-                    case INT_CONST:
-                        writeCurrToke();
-                        realAdvance();
-                        break;
-                    case STRING_CONST:
-                        writeCurrToke();
-                        realAdvance();
-                        break;
-                    case IDENTIFIER:
-                        writeCurrToke();
-                }
-                break;
+        try {
+            writer.write("<term>\n");
+            switch (currToke()) {
+                case "(":
+                    writeCurrToke();
+                    realAdvance();
+                    compileExpression();
+                    if (!currToke().equals(")")) {
+                        err.println("incorrect format! in compileTerm()");
+                        exit(0);
+                    }
+                    writeCurrToke();
+                    realAdvance();
+                    break;
+                case "-":
+                case "~":
+                    writeCurrToke();
+                    realAdvance();
+                    compileTerm();
+                    break;
+                default:
+                    switch (jToke.tokenType()) {
+                        case KEYWORD:
+                            if (jToke.keyWord() != JackTokenizer.keys.TRUE
+                                    && jToke.keyWord() != JackTokenizer.keys.FALSE
+                                    && jToke.keyWord() != JackTokenizer.keys.NULL
+                                    && jToke.keyWord() != JackTokenizer.keys.THIS) {
+                                err.println("incorrect format! in compileTerm()");
+                                exit(0);
+                            }
+                            writeCurrToke();
+                            realAdvance();
+                            break;
+                        case INT_CONST:
+                            writeCurrToke();
+                            realAdvance();
+                            break;
+                        case STRING_CONST:
+                            writeCurrToke();
+                            realAdvance();
+                            break;
+                        case IDENTIFIER:
+                            saveCurrToke();
+                            realAdvance();
+                            // Remember that you have to save the token
+                            if (currToke().equals("[")) {
+                                writeSavedToke();
+                                writeCurrToke();
+                                compileExpression();
+                                if (!currToke().equals("]")) {
+                                    err.println("incorrect format! in compileTerm()");
+                                    exit(0);
+                                }
+                                realAdvance();
+                            } else if (currToke().equals("(")
+                                    || currToke().equals(".")) {
+                                compileSubroutineCall(true);
+                            } else {
+                                writeSavedToke();
+                            }
+
+                    }
+                    break;
+            }
+            writer.write("</term>\n");
+        }
+        catch (IOException e){
+            err.println(e);
         }
     }
 
-    private void compileSubroutineCall(){
-        //TODO
+    private void compileSubroutineCall(Boolean saved){
+        try {
+            writer.write("<subroutineCall>\n");
+            if (saved) {
+                writeSavedToke();
+            } else {
+              writeCurrToke();
+            }
+            //TODO the rest of this
+            writer.write("</subroutineCall>\n");
+        }
+        catch (IOException e){
+            err.println(e);
+        }
     }
 
     public void compileExpressionList(){
@@ -575,6 +614,20 @@ public class CompilationEngine {
             String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
             System.out.print(line);
             writer.write(line);
+        } catch (IOException e){
+            err.println(e);
+        }
+    }
+
+    private void saveCurrToke(){
+        String tokenType = currTokeType();
+        savedToken = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
+    }
+
+    private void writeSavedToke(){
+        try {
+            System.out.print(savedToken);
+            writer.write(savedToken);
         } catch (IOException e){
             err.println(e);
         }
