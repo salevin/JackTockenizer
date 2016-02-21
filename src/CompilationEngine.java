@@ -227,22 +227,39 @@ public class CompilationEngine {
         try {
             writer.write("<parameterList>\n");
             if (!currToke().equals(")")) {
-                if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
+                if (jToke.keyWord() != JackTokenizer.keys.INT
+                        && jToke.keyWord() != JackTokenizer.keys.CHAR
+                        && jToke.keyWord() != JackTokenizer.keys.BOOLEAN
+                        && jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
                     err.println("incorrect format! compileParameterList 1");
-                    writer.close();
+                    exit(0);
+                }
+                writeCurrToke();
+                realAdvance();
+                if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
+                    err.println("incorrect format! compileParameterList 2");
                     exit(0);
                 }
                 writeCurrToke();
                 realAdvance();
                 while (!currToke().equals(")")) {
                     if (!currToke().equals(",")) {
-                        err.println("incorrect format! compileParameterList 2");
+                        err.println("incorrect format! compileParameterList 3");
+                        exit(0);
+                    }
+                    writeCurrToke();
+                    realAdvance();
+                    if (jToke.keyWord() != JackTokenizer.keys.INT
+                            && jToke.keyWord() != JackTokenizer.keys.CHAR
+                            && jToke.keyWord() != JackTokenizer.keys.BOOLEAN
+                            && jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
+                        err.println("incorrect format! compileParameterList 4");
                         exit(0);
                     }
                     writeCurrToke();
                     realAdvance();
                     if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
-                        err.println("incorrect format! compileParameterList 3");
+                        err.println("incorrect format! compileParameterList 5");
                         exit(0);
                     }
                     writeCurrToke();
@@ -671,7 +688,6 @@ public class CompilationEngine {
             String tokenType = currTokeType();
 
             String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
-            System.out.print(line);
             writer.write(line);
         } catch (IOException e) {
             err.println(e);
@@ -685,7 +701,6 @@ public class CompilationEngine {
 
     private void writeSavedToke() {
         try {
-            System.out.print(savedToken);
             writer.write(savedToken);
         } catch (IOException e) {
             err.println(e);
