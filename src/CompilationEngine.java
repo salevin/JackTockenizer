@@ -226,7 +226,7 @@ public class CompilationEngine {
 
     public void compileParameterList() {
         try {
-            writer.write("</parameterList>\n");
+            writer.write("<parameterList>\n");
             if (!currToke().equals(")")) {
                 if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
                     err.println("incorrect format!");
@@ -634,7 +634,6 @@ public class CompilationEngine {
                     exit(0);
             }
 
-            //TODO the rest of this
             writer.write("</subroutineCall>\n");
         } catch (IOException e) {
             err.println(e);
@@ -642,8 +641,27 @@ public class CompilationEngine {
     }
 
     public void compileExpressionList() {
-        // TODO
-        //Compiles a (possibly empty) comma-separated list of expressions.
+        try {
+            writer.write("<expressionList>\n");
+            if (!currToke().equals(")")) {
+                compileExpression();
+                while (!currToke().equals(")")) {
+                    if (!currToke().equals(",")) {
+                        err.println("incorrect format!");
+                        exit(0);
+                    }
+                    writeCurrToke();
+                    realAdvance();
+                    compileExpression();
+                }
+
+            }
+
+            writer.write("</expressionList>\n");
+
+        } catch (IOException x) {
+            err.println(x);
+        }
     }
 
     private void writeCurrToke() {
