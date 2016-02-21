@@ -461,7 +461,27 @@ public class CompilationEngine {
 
             compileStatements();
 
-            //TODO Finish this
+            writeCurrToke();
+            realAdvance();
+
+            if (jToke.tokenType() == JackTokenizer.types.KEYWORD
+                    && jToke.keyWord() == JackTokenizer.keys.ELSE){
+                writeCurrToke();
+                realAdvance();
+
+                if (!currToke().equals("{")) {
+                    err.println("incorrect format! in compileIf() 3");
+                    exit(0);
+                }
+                writeCurrToke();
+                realAdvance();
+
+
+                compileStatements();
+
+                writeCurrToke();
+                realAdvance();
+            }
 
             writer.write("</letStatement>\n");
 
