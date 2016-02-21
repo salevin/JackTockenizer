@@ -84,7 +84,7 @@ public class CompilationEngine {
 
             if (currToke().equals("}")) {
                 writeCurrToke();
-                writer.write("</class>");
+                writer.write("</class>\n");
 
             } else {
                 err.println("incorrect format! compileClass");
@@ -228,20 +228,21 @@ public class CompilationEngine {
             writer.write("<parameterList>\n");
             if (!currToke().equals(")")) {
                 if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
-                    err.println("incorrect format! compileParameterList");
+                    err.println("incorrect format! compileParameterList 1");
+                    writer.close();
                     exit(0);
                 }
                 writeCurrToke();
                 realAdvance();
                 while (!currToke().equals(")")) {
                     if (!currToke().equals(",")) {
-                        err.println("incorrect format! compileParameterList");
+                        err.println("incorrect format! compileParameterList 2");
                         exit(0);
                     }
                     writeCurrToke();
                     realAdvance();
                     if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
-                        err.println("incorrect format! compileParameterList");
+                        err.println("incorrect format! compileParameterList 3");
                         exit(0);
                     }
                     writeCurrToke();
@@ -286,24 +287,27 @@ public class CompilationEngine {
                 switch (currToke()) {
                     case "let":
                         compileLet();
+                        realAdvance();
                         break;
                     case "if":
                         compileIf();
                         break;
                     case "while":
                         compileWhile();
+                        realAdvance();
                         break;
                     case "do":
                         compileDo();
+                        realAdvance();
                         break;
                     case "return":
                         compileReturn();
+                        realAdvance();
                         break;
                     default:
                         System.err.println("compileStatements problemo");
                         exit(0);
                 }
-                realAdvance();
             }
             writer.write("</statements>\n");
 
@@ -370,7 +374,6 @@ public class CompilationEngine {
             }
 
             writer.write("</letStatement>\n");
-            jToke.advance();
 
         } catch (IOException x) {
             err.println(x);
@@ -480,10 +483,9 @@ public class CompilationEngine {
                 compileStatements();
 
                 writeCurrToke();
-                realAdvance();
             }
 
-            writer.write("</letStatement>\n");
+            writer.write("</ifStatement>\n");
 
         } catch (IOException x) {
             err.println(x);
