@@ -228,7 +228,7 @@ public class CompilationEngine {
 
     public void compileParameterList(){
         try {
-            writer.write("</parameterList>");
+            writer.write("</parameterList>\n");
             if (!currToke().equals(")")) {
                 if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
                     err.println("incorrect format!");
@@ -316,7 +316,7 @@ public class CompilationEngine {
             }
             writeCurrToke();
 
-            writer.write("</doStatement>");
+            writer.write("</doStatement>\n");
 
             jToke.advance();
 
@@ -345,9 +345,11 @@ public class CompilationEngine {
                 writeCurrToke();
                 compileExpression();
                 writeCurrToke();
+                realAdvance();
             }
             else if(currToke().equals("=")){
                 writeCurrToke();
+                realAdvance();
             }
             else{
                 err.println("incorrect format! in compileLet()");
@@ -362,7 +364,7 @@ public class CompilationEngine {
                 exit(0);
             }
 
-            writer.write("</letStatement>");
+            writer.write("</letStatement>\n");
             jToke.advance();
 
         } catch (IOException x){
@@ -411,7 +413,7 @@ public class CompilationEngine {
 
     public void compileReturn(){
         try {
-            writer.write("<returnStatement>");
+            writer.write("<returnStatement>\n");
             writeCurrToke();
             jToke.advance();
 
@@ -420,7 +422,7 @@ public class CompilationEngine {
             }
 
             writeCurrToke();
-            writer.write("</returnStatement>");
+            writer.write("</returnStatement>\n");
         } catch (IOException x) {
             err.println(x);
         }
@@ -482,7 +484,7 @@ public class CompilationEngine {
                 exit(0);
             }
 
-            writer.write("</letStatement>");
+            writer.write("</letStatement>\n");
 
         } catch (IOException x){
             err.println(x);
@@ -495,13 +497,15 @@ public class CompilationEngine {
 
             compileTerm();
 
-            while("+-*/&|<>=".contains(jToke.returnToken())){
+            while("s+-*/&|<>=".contains(jToke.returnToken())){
                 writeCurrToke();
+                realAdvance();
                 compileTerm();
             }
 
 
-            writer.write("</expression>");
+            writer.write("</expression>\n");
+
 
         } catch (IOException x){
             err.println(x);
@@ -549,7 +553,7 @@ public class CompilationEngine {
                         realAdvance();
                         break;
                     case IDENTIFIER:
-                        //TODO the confusing part
+                        writeCurrToke();
                 }
                 break;
         }
