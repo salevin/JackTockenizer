@@ -328,7 +328,7 @@ public class CompilationEngine {
             }
             writer.write("</statements>\n");
 
-        } catch (IOException x){
+        } catch (IOException x) {
             err.println(x);
         }
     }
@@ -485,7 +485,7 @@ public class CompilationEngine {
             realAdvance();
 
             if (jToke.tokenType() == JackTokenizer.types.KEYWORD
-                    && jToke.keyWord() == JackTokenizer.keys.ELSE){
+                    && jToke.keyWord() == JackTokenizer.keys.ELSE) {
                 writeCurrToke();
                 realAdvance();
 
@@ -604,59 +604,55 @@ public class CompilationEngine {
     // Boolean saved should only be true if
     // it is being called from inside compile term
     private void compileSubroutineCall(Boolean saved) {
-        try {
-            writer.write("<subroutineCall>\n");
-            if (saved) {
-                writeSavedToke();
-            } else {
+
+        if (saved) {
+            writeSavedToke();
+        } else {
+            writeCurrToke();
+            realAdvance();
+        }
+
+        switch (currToke()) {
+            case "(":
                 writeCurrToke();
                 realAdvance();
-            }
-
-            switch (currToke()){
-                case "(":
-                    writeCurrToke();
-                    realAdvance();
-                    compileExpressionList();
-                    if (!currToke().equals(")")) {
-                        err.println("incorrect format! in compileSubroutineCall()");
-                        exit(0);
-                    }
-                    writeCurrToke();
-                    realAdvance();
-                    break;
-                case ".":
-                    writeCurrToke();
-                    realAdvance();
-                    if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
-                        err.println("incorrect format! in compileSubroutineCall()");
-                        exit(0);
-                    }
-                    writeCurrToke();
-                    realAdvance();
-                    if (!currToke().equals("(")) {
-                        err.println("incorrect format! in compileSubroutineCall()");
-                        exit(0);
-                    }
-                    writeCurrToke();
-                    realAdvance();
-                    compileExpressionList();
-                    if (!currToke().equals(")")) {
-                        err.println("incorrect format! in compileSubroutineCall()");
-                        exit(0);
-                    }
-                    writeCurrToke();
-                    realAdvance();
-                    break;
-                default:
-                    err.println("incorrect format! in compileDo()");
+                compileExpressionList();
+                if (!currToke().equals(")")) {
+                    err.println("incorrect format! in compileSubroutineCall()");
                     exit(0);
-            }
-
-            writer.write("</subroutineCall>\n");
-        } catch (IOException e) {
-            err.println(e);
+                }
+                writeCurrToke();
+                realAdvance();
+                break;
+            case ".":
+                writeCurrToke();
+                realAdvance();
+                if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
+                    err.println("incorrect format! in compileSubroutineCall()");
+                    exit(0);
+                }
+                writeCurrToke();
+                realAdvance();
+                if (!currToke().equals("(")) {
+                    err.println("incorrect format! in compileSubroutineCall()");
+                    exit(0);
+                }
+                writeCurrToke();
+                realAdvance();
+                compileExpressionList();
+                if (!currToke().equals(")")) {
+                    err.println("incorrect format! in compileSubroutineCall()");
+                    exit(0);
+                }
+                writeCurrToke();
+                realAdvance();
+                break;
+            default:
+                err.println("incorrect format! in compileDo()");
+                exit(0);
         }
+
+
     }
 
     public void compileExpressionList() {
