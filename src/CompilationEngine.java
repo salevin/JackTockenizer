@@ -1,7 +1,3 @@
-import com.sun.xml.internal.bind.v2.TODO;
-import com.sun.xml.internal.fastinfoset.sax.SystemIdResolver;
-import com.sun.xml.internal.fastinfoset.util.StringArray;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
