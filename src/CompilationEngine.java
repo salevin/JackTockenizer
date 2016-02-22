@@ -585,6 +585,7 @@ public class CompilationEngine {
                                     err.println("incorrect format! in compileTerm()");
                                     exit(0);
                                 }
+                                writeCurrToke();
                                 realAdvance();
                             } else if (currToke().equals("(")
                                     || currToke().equals(".")) {
