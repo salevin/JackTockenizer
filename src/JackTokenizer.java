@@ -92,7 +92,7 @@ public class JackTokenizer {
             // String
             if (curr_char == '"') {
                 token = "";
-                advanceString(token);
+                token = advanceString(token);
                 curr_tokenType = types.STRING_CONST;
                 return;
             }

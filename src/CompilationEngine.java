@@ -360,7 +360,7 @@ public class CompilationEngine {
             realAdvance();
 
             if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileLet() 1");
                 exit(0);
             }
             writeCurrToke();
@@ -368,21 +368,25 @@ public class CompilationEngine {
 
             if (currToke().equals("[")) {
                 writeCurrToke();
+                realAdvance();
                 compileExpression();
                 writeCurrToke();
                 realAdvance();
-            } else if (currToke().equals("=")) {
+            }
+
+            if (currToke().equals("=")) {
                 writeCurrToke();
                 realAdvance();
             } else {
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileLet() 2");
                 exit(0);
             }
             compileExpression();
             if (currToke().equals(";")) {
                 writeCurrToke();
             } else {
-                err.println("incorrect format! in compileLet()");
+                err.println("incorrect format! in compileLet() 3");
+                writer.close();
                 exit(0);
             }
 
@@ -575,6 +579,7 @@ public class CompilationEngine {
                             if (currToke().equals("[")) {
                                 writeSavedToke();
                                 writeCurrToke();
+                                realAdvance();
                                 compileExpression();
                                 if (!currToke().equals("]")) {
                                     err.println("incorrect format! in compileTerm()");
