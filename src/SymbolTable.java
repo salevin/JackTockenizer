@@ -1,51 +1,88 @@
-import com.sun.xml.internal.bind.v2.TODO;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Objects;
 
 /**
  * Created by sam on 2/25/16.
  */
 public class SymbolTable {
 
-    public enum Type {
-        SATIC, FIELD, VAR, ARG, NONE
+    public enum Kind {
+        STATIC, FIELD, VAR, ARG, NONE
     }
 
+    private static Hashtable<String, String[]> classScope;
+    private static Hashtable<String, String[]> subroutineScope;
+
     public SymbolTable() {
-        //TODO creates new empty string table
+        classScope = new Hashtable<>();
+        subroutineScope = new Hashtable<>();
     }
 
     private void startSubroutine() {
-        // TODO Starts a new subroutine scope (i.e., resets the subroutine’s symbol table).
+        subroutineScope.clear();
     }
 
-    private void Define(String name, String type, Type kind) {
-//        TODO Defines a new identifier of a
-//        given name, type, and kind
-//        and assigns it a running index.
-//        STATIC and FIELD identifiers
-//        have a class scope, while ARG
-//        and VAR identifiers have a
-//        subroutine scope.
+    private void Define(String name, String type, Kind kind) {
+        String[] kindType = new String[3];
+        kindType[0] = type;
+        kindType[1] = kind.toString();
+        if (kind == Kind.VAR || kind == Kind.ARG) {
+            kindType[2] = Integer.toString(subroutineScope.size());
+            subroutineScope.put(name, kindType);
+        } else if (kind == Kind.STATIC || kind == Kind.FIELD) {
+            kindType[2] = Integer.toString(classScope.size());
+            classScope.put(name, kindType);
+        } else {
+            System.err.println("Kind is None in Define");
+            System.exit(1);
+        }
     }
 
-    private Integer VarCount(Type kind) {
-//        TODO  Returns the number of
-//        variables of the given kind
-//        already defined in the current
-//        scope.
-        return null;
+    private Integer VarCount(Kind kind) {
+        int count = 0;
+        for (String key : classScope.keySet()) {
+            if (Objects.equals(classScope.get(key)[1], kind.toString())) {
+                count++;
+            }
+        }
+        for (String key : subroutineScope.keySet()) {
+            if (Objects.equals(subroutineScope.get(key)[1], kind.toString())) {
+                count++;
+            }
+        }
+        return count;
     }
 
-    private Type KindOf(String name) {
-//        TODO Returns the kind of the named
-//        identifier in the current scope.
-//        If the identifier is unknown in
-//        the current scope, returns
-//        NONE.
-        return null;
+    private Kind KindOf(String name) {
+        if (classScope.contains(name))
+            return toKind(classScope.get(name)[1]);
+        else
+            return toKind(subroutineScope.get(name)[1]);
     }
 
-    private String TypeOf(String nam) {
-        return null;
+    private String TypeOf(String name) {
+        if (classScope.contains(name))
+            return classScope.get(name)[0];
+        else
+            return subroutineScope.get(name)[0];
+    }
+
+    private int IndexOf(String name){
+        if (classScope.contains(name))
+            return Integer.parseInt(classScope.get(name)[3]);
+        else
+            return Integer.parseInt(subroutineScope.get(name)[3]);
+    }
+
+    private Kind toKind(String stringType) {
+        for (Kind kind : Kind.values()) {
+            if (stringType.equals(kind.toString()))
+                return kind;
+        }
+        System.err.println("No such type");
+        return Kind.NONE;
     }
 
 }
