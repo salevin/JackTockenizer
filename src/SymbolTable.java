@@ -87,8 +87,10 @@ public class SymbolTable {
     public int IndexOf(String name){
         if (classScope.contains(name))
             return Integer.parseInt(classScope.get(name)[2]);
-        else
+        else if (subroutineScope.contains(name))
             return Integer.parseInt(subroutineScope.get(name)[2]);
+        else
+            return -1;
     }
 
     public Kind toKind(String stringType) {
