@@ -24,22 +24,26 @@ public class SymbolTable {
         subroutineScope.clear();
     }
 
-    private void Define(String name, String type, Kind kind) {
+    public void Define(String name, String type, Kind kind) {
         int count = 0;
         String[] kindType = new String[3];
         kindType[0] = type;
         kindType[1] = kind.toString();
+        // Var and Arg go into subroutine scope
+        // Static and Field go into class scope
         if (kind == Kind.VAR || kind == Kind.ARG) {
-            for (String key : classScope.keySet()) {
-                if (Objects.equals(classScope.get(key)[1], kind.toString())) {
+            // Set index to the number of it's kind in it's scope
+            for (String key : subroutineScope.keySet()) {
+                if (Objects.equals(subroutineScope.get(key)[1], kind.toString())) {
                     count++;
                 }
             }
             kindType[2] = Integer.toString(count);
             subroutineScope.put(name, kindType);
         } else if (kind == Kind.STATIC || kind == Kind.FIELD) {
-            for (String key : subroutineScope.keySet()) {
-                if (Objects.equals(subroutineScope.get(key)[1], kind.toString())) {
+            // Set index to the number of it's kind in it's scope
+            for (String key : classScope.keySet()) {
+                if (Objects.equals(classScope.get(key)[1], kind.toString())) {
                     count++;
                 }
             }
@@ -82,9 +86,9 @@ public class SymbolTable {
 
     private int IndexOf(String name){
         if (classScope.contains(name))
-            return Integer.parseInt(classScope.get(name)[3]);
+            return Integer.parseInt(classScope.get(name)[2]);
         else
-            return Integer.parseInt(subroutineScope.get(name)[3]);
+            return Integer.parseInt(subroutineScope.get(name)[2]);
     }
 
     private Kind toKind(String stringType) {
