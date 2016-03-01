@@ -25,14 +25,25 @@ public class SymbolTable {
     }
 
     private void Define(String name, String type, Kind kind) {
+        int count = 0;
         String[] kindType = new String[3];
         kindType[0] = type;
         kindType[1] = kind.toString();
         if (kind == Kind.VAR || kind == Kind.ARG) {
-            kindType[2] = Integer.toString(subroutineScope.size());
+            for (String key : classScope.keySet()) {
+                if (Objects.equals(classScope.get(key)[1], kind.toString())) {
+                    count++;
+                }
+            }
+            kindType[2] = Integer.toString(count);
             subroutineScope.put(name, kindType);
         } else if (kind == Kind.STATIC || kind == Kind.FIELD) {
-            kindType[2] = Integer.toString(classScope.size());
+            for (String key : subroutineScope.keySet()) {
+                if (Objects.equals(subroutineScope.get(key)[1], kind.toString())) {
+                    count++;
+                }
+            }
+            kindType[2] = Integer.toString(count);
             classScope.put(name, kindType);
         } else {
             System.err.println("Kind is None in Define");
