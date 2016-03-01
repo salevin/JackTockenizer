@@ -20,7 +20,7 @@ public class SymbolTable {
         subroutineScope = new Hashtable<>();
     }
 
-    private void startSubroutine() {
+    public void startSubroutine() {
         subroutineScope.clear();
     }
 
@@ -55,7 +55,7 @@ public class SymbolTable {
         }
     }
 
-    private Integer VarCount(Kind kind) {
+    public Integer VarCount(Kind kind) {
         int count = 0;
         for (String key : classScope.keySet()) {
             if (Objects.equals(classScope.get(key)[1], kind.toString())) {
@@ -70,28 +70,28 @@ public class SymbolTable {
         return count;
     }
 
-    private Kind KindOf(String name) {
+    public Kind KindOf(String name) {
         if (classScope.contains(name))
             return toKind(classScope.get(name)[1]);
         else
             return toKind(subroutineScope.get(name)[1]);
     }
 
-    private String TypeOf(String name) {
+    public String TypeOf(String name) {
         if (classScope.contains(name))
             return classScope.get(name)[0];
         else
             return subroutineScope.get(name)[0];
     }
 
-    private int IndexOf(String name){
+    public int IndexOf(String name){
         if (classScope.contains(name))
             return Integer.parseInt(classScope.get(name)[2]);
         else
             return Integer.parseInt(subroutineScope.get(name)[2]);
     }
 
-    private Kind toKind(String stringType) {
+    public Kind toKind(String stringType) {
         for (Kind kind : Kind.values()) {
             if (stringType.equals(kind.toString()))
                 return kind;
