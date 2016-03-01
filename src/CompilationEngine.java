@@ -1,7 +1,4 @@
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 import static java.lang.System.*;
 
@@ -13,9 +10,15 @@ public class CompilationEngine {
     private JackTokenizer jToke;
     private BufferedWriter writer;
     private String savedToken;
+    private SymbolTable sTable;
+    private String[] prevTwo;
+    private String className;
 
     public CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
+        sTable = new SymbolTable();
+        prevTwo = new String[] {"",""};
+        className = new String("");
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
         } catch (IOException x) {
@@ -41,6 +44,7 @@ public class CompilationEngine {
             realAdvance();
 
             if (jToke.tokenType() == JackTokenizer.types.IDENTIFIER) {
+                className = currToke();
                 writeCurrToke();
             } else {
                 err.println("No class dec!");
@@ -131,6 +135,7 @@ public class CompilationEngine {
 
     public void compileSubroutineDec() {
         try {
+            sTable.startSubroutine();
             writer.write("<subroutineDec>\n");
             writeCurrToke();
             realAdvance();
@@ -685,6 +690,11 @@ public class CompilationEngine {
         try {
             String tokenType = currTokeType();
 
+            checkTable();
+
+            prevTwo[1] = prevTwo[0];
+            prevTwo[0] = currToke();
+
             String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
             writer.write(line);
         } catch (IOException e) {
@@ -699,6 +709,12 @@ public class CompilationEngine {
 
     private void writeSavedToke() {
         try {
+
+            checkTable();
+
+            prevTwo[1] = prevTwo[0];
+            prevTwo[0] = currToke();
+
             writer.write(savedToken);
         } catch (IOException e) {
             err.println(e);
@@ -755,6 +771,49 @@ public class CompilationEngine {
         }
 
     }
+
+    private void checkTable() {
+        if (!prevTwo[1].isEmpty()) {
+            if (jToke.tokenType() == JackTokenizer.types.IDENTIFIER) {
+                String name = currToke();
+                if (sTable.IndexOf(name) == -1) {
+                    switch (prevTwo[1]) {
+                        case "(":
+                        case ",":
+                            sTable.Define(name, prevTwo[0], SymbolTable.Kind.ARG);
+                            break;
+                        case "method":
+                        case "constructor":
+                            name = "this";
+                            sTable.Define(name, className, SymbolTable.Kind.ARG);
+                            break;
+                        default:
+                            for (SymbolTable.Kind kind : SymbolTable.Kind.values()) {
+                                if (prevTwo[1].equals(kind.toString().toLowerCase()))
+                                    sTable.Define(name, prevTwo[0], kind);
+                            }
+                            break;
+                    }
+                    writeTable(true, name);
+                }
+                else writeTable(false, name);
+            }
+        }
+    }
+
+    private void writeTable(Boolean defined, String name){
+        try {
+            if (defined)
+                writer.write("Defined: " + name + " Type: " + sTable.TypeOf(name) + " Kind: " + sTable.KindOf(name)
+                        + " Index: " + sTable.IndexOf(name) + "\n");
+            else
+                writer.write("Called: " + name + " Type: " + sTable.TypeOf(name) + " Kind: " + sTable.KindOf(name)
+                        + " Index: " + sTable.IndexOf(name) + "\n");
+        } catch (IOException e) {
+            err.println(e);
+        }
+    }
+
 
 
 }
