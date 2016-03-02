@@ -796,7 +796,6 @@ public class CompilationEngine {
                         case "function":
                             name = "this";
                             sTable.Define(name, className, SymbolTable.Kind.ARG);
-                            System.out.println(name);
                             break;
                         default:
                             idKind = sTable.toKind(prevTwo[1]);
