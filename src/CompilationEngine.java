@@ -14,12 +14,12 @@ public class CompilationEngine {
     private String[] prevTwo;
     private String className;
     private String savedTokeType;
-    private String SavedToke;
+    private boolean prevWritten;
 
     public CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
         sTable = new SymbolTable();
-        prevTwo = new String[] {"",""};
+        prevTwo = new String[]{"", ""};
         className = "";
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
@@ -692,14 +692,19 @@ public class CompilationEngine {
         try {
             String tokenType = currTokeType();
 
-            if (tokenType.equals("identifier") && !"{;".contains(prevTwo[1])) {
+
+            if (tokenType.equals("identifier") && sTable.IndexOf(currToke()) != -1) {
+                writeTable(false, currToke());
+                prevWritten = false;
+            } else if (tokenType.equals("identifier") && !"{;".contains(prevTwo[1])) {
                 checkTable();
-            } else {
+            } else if (!prevWritten || !currToke().equals(",")) {
+                prevWritten = false;
                 prevTwo[1] = prevTwo[0];
                 prevTwo[0] = currToke();
             }
 
-                String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
+            String line = "<" + tokenType + "> " + currToke() + " </" + tokenType + ">\n";
             writer.write(line);
         } catch (IOException e) {
             err.println(e);
@@ -714,11 +719,15 @@ public class CompilationEngine {
     private void writeSavedToke() {
         try {
 
-            if (savedTokeType.equals("identifier") && !"{;".contains(prevTwo[1])) {
+            if (savedTokeType.equals("identifier") && sTable.IndexOf(savedToken) != -1) {
+                writeTable(false, savedToken);
+                prevWritten = false;
+            } else if (savedTokeType.equals("identifier") && !"{;".contains(prevTwo[1])) {
                 checkTable();
-            } else {
+            } else if (!prevWritten || !savedTokeType.equals(",")) {
                 prevTwo[1] = prevTwo[0];
                 prevTwo[0] = savedToken;
+                prevWritten = false;
             }
 
             String tokenType = savedTokeType;
@@ -800,17 +809,18 @@ public class CompilationEngine {
                         default:
                             idKind = sTable.toKind(prevTwo[1]);
                             if (idKind != SymbolTable.Kind.NONE)
-                                    sTable.Define(name, prevTwo[0], idKind);
+                                sTable.Define(name, prevTwo[0], idKind);
                             else return;
                             break;
                     }
                     writeTable(true, name);
-                } else writeTable(false, name);
+                    prevWritten = true;
+                }
             }
         }
     }
 
-    private void writeTable(Boolean defined, String name){
+    private void writeTable(Boolean defined, String name) {
         try {
             if (defined)
                 writer.write("Defined: " + name + " Type: " + sTable.TypeOf(name) + " Kind: " + sTable.KindOf(name)
@@ -822,7 +832,6 @@ public class CompilationEngine {
             err.println(e);
         }
     }
-
 
 
 }
