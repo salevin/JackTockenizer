@@ -71,23 +71,23 @@ public class SymbolTable {
     }
 
     public Kind KindOf(String name) {
-        if (classScope.contains(name))
+        if (classScope.containsKey(name))
             return toKind(classScope.get(name)[1]);
         else
             return toKind(subroutineScope.get(name)[1]);
     }
 
     public String TypeOf(String name) {
-        if (classScope.contains(name))
+        if (classScope.containsKey(name))
             return classScope.get(name)[0];
         else
             return subroutineScope.get(name)[0];
     }
 
     public int IndexOf(String name){
-        if (classScope.contains(name))
+        if (classScope.containsKey(name))
             return Integer.parseInt(classScope.get(name)[2]);
-        else if (subroutineScope.contains(name))
+        else if (subroutineScope.containsKey(name))
             return Integer.parseInt(subroutineScope.get(name)[2]);
         else
             return -1;
@@ -95,10 +95,9 @@ public class SymbolTable {
 
     public Kind toKind(String stringType) {
         for (Kind kind : Kind.values()) {
-            if (stringType.equals(kind.toString()))
+            if (stringType.equalsIgnoreCase(kind.toString()))
                 return kind;
         }
-        System.err.println("No such type");
         return Kind.NONE;
     }
 
