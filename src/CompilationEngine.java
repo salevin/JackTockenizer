@@ -811,10 +811,10 @@ public class CompilationEngine {
                             if (idKind != SymbolTable.Kind.NONE)
                                 sTable.Define(name, prevTwo[0], idKind);
                             else return;
+                            prevWritten = true;
                             break;
                     }
                     writeTable(true, name);
-                    prevWritten = true;
                 }
             }
         }
