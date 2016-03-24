@@ -1,9 +1,27 @@
 import com.sun.xml.internal.bind.v2.TODO;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+import static java.lang.System.err;
+
 /**
  * Created by john on 3/24/16.
  */
 public class VMwriter {
+
+
+    private BufferedWriter writer;
+
+    public VMwriter(String outputPath) {
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
+        } catch (IOException x) {
+            err.println(x);
+        }
+    }
 
 
     public enum Segment{
@@ -29,11 +47,11 @@ public class VMwriter {
         //TODO
     }
 
-    public void writeGoto(String goto){
+    public void writeGoto(String str){
         //TODO
     }
 
-    public void writeIf(String if){
+    public void writeIf(String str){
         //TODO
     }
 
@@ -52,4 +70,8 @@ public class VMwriter {
     public void close(){
         //TODO close the output file
     }
+
+
+
+
     }

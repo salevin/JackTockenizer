@@ -30,7 +30,7 @@ public class CompilationEngine {
 
     public void compileClass() {
         try {
-//            writer.write("<class>\n");
+            writer.write("<class>\n");
             JackTokenizer.keys key;
 
             realAdvance();
