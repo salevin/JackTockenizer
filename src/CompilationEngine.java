@@ -30,14 +30,14 @@ public class CompilationEngine {
 
     public void compileClass() {
         try {
-            writer.write("<class>\n");
+//            writer.write("<class>\n");
             JackTokenizer.keys key;
 
             realAdvance();
             key = jToke.keyWord();
 
             if (key == JackTokenizer.keys.CLASS) {
-                writeCurrToke();
+//                writeCurrToke();
             } else {
                 err.println("No class dec!");
                 exit(0);
@@ -47,7 +47,7 @@ public class CompilationEngine {
 
             if (jToke.tokenType() == JackTokenizer.types.IDENTIFIER) {
                 className = currToke();
-                writeCurrToke();
+//                writeCurrToke();
             } else {
                 err.println("No class dec!");
                 exit(0);
@@ -56,7 +56,7 @@ public class CompilationEngine {
             realAdvance();
 
             if (currToke().equals("{")) {
-                writeCurrToke();
+//                writeCurrToke();
             } else {
                 err.println("incorrect format!");
                 exit(0);
@@ -85,8 +85,8 @@ public class CompilationEngine {
             }
 
             if (currToke().equals("}")) {
-                writeCurrToke();
-                writer.write("</class>\n");
+//                writeCurrToke();
+//                writer.write("</class>\n");
 
             } else {
                 err.println("incorrect format! compileClass");
