@@ -1,7 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+
 import static java.lang.System.*;
 
 /**
@@ -380,6 +378,7 @@ public class CompilationEngine {
                 exit(0);
             }
             writeCurrToke();
+            String pop = currToke();
             realAdvance();
 
             if (currToke().equals("[")) {
@@ -405,6 +404,8 @@ public class CompilationEngine {
                 writer.close();
                 exit(0);
             }
+
+            VMwriter.writePop(VMwriter.toSegment(sTable.KindOf(pop).toString()), sTable.IndexOf(pop));
 
             writer.write("</letStatement>\n");
 

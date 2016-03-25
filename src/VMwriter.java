@@ -30,7 +30,7 @@ public class VMwriter {
     }
 
     public enum Segment{
-        CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
+        CONSTANT, ARGUMENT, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
     }
     public enum Command{
         ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT
@@ -46,7 +46,7 @@ public class VMwriter {
 
     public void writePop(Segment seg, int index){
         try{
-            writer.write(String.format("pop %s %d\n", seg.toString(), index));
+            writer.write(String.format("pop %s %d\n", seg.toString().toLowerCase(), index));
         }catch (IOException e) {
             err.println(e);
         }
@@ -122,6 +122,32 @@ public class VMwriter {
     public void setConstructor(int num){
         constructor = true;
         fields = num;
+    }
+
+    Segment toSegment(String seg){
+        switch (seg) {
+            case "FIELD":
+            case "STATIC":
+                return Segment.THIS;
+            case "VAR":
+                return Segment.LOCAL;
+            case "ohs":
+                return Segment.THAT;
+            case "ARG":
+                return Segment.ARGUMENT;
+            case "method":
+                return Segment.POINTER;
+            case "Ed":
+                return Segment.STATIC;
+            case "static":
+                return Segment.TEMP;
+            case "var":
+            case "int":
+                return Segment.CONSTANT;
+            default:
+                err.println("no such segment");
+                return null;
+        }
     }
 
     public void close(){
