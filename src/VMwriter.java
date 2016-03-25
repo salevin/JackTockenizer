@@ -37,11 +37,19 @@ public class VMwriter {
     }
 
     public void writePush(Segment seg, int index ){
-    //TODO
+        try{
+            writer.write(String.format("push %s %d\n", seg.toString(), index));
+        }catch (IOException e) {
+            err.println(e);
+        }
     }
 
     public void writePop(Segment seg, int index){
-        //TODO
+        try{
+            writer.write(String.format("pop %s %d\n", seg.toString(), index));
+        }catch (IOException e) {
+            err.println(e);
+        }
     }
 
     public void writeArithmetic(Command command){
