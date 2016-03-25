@@ -16,14 +16,14 @@ public class VMwriter {
     private BufferedWriter writer;
     private String className;
 
-    public VMwriter(String outputPath, String classN) {
+    public VMwriter(String outputPath) {
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
-            writer.close();
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath + ".vm1")));
         } catch (IOException x) {
             err.println(x);
         }
-        className = classN;
+
+        className = outputPath.substring(outputPath.lastIndexOf("/") + 1,outputPath.length());
 
         System.out.println(className);
     }
@@ -67,7 +67,7 @@ public class VMwriter {
     public void writeFunction(String name, int nLocals){
         try {
             writer.write("function " + className + "." + name + " " +
-                    + nLocals);
+                    + nLocals + "\n");
 
 
         } catch (IOException e) {

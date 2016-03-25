@@ -14,6 +14,7 @@ public class CompilationEngine {
     private String[] prevTwo;
     private String className;
     private String savedTokeType;
+    private String funcName;
     private boolean prevWritten;
     private VMwriter VMwriter;
 
@@ -22,12 +23,13 @@ public class CompilationEngine {
         sTable = new SymbolTable();
         prevTwo = new String[]{"", ""};
         className = "";
+        funcName = "";
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
         } catch (IOException x) {
             err.println(x);
         }
-        VMwriter = new VMwriter(outputPath.substring(0, outputPath.length() - 4) + ".vm1", className);
+        VMwriter = new VMwriter(outputPath.substring(0, outputPath.length() - 4));
     }
 
     public void compileClass() {
@@ -95,6 +97,7 @@ public class CompilationEngine {
                 exit(0);
             }
             writer.close();
+            VMwriter.close();
         } catch (IOException x) {
             err.println(x);
         }
@@ -202,6 +205,8 @@ public class CompilationEngine {
                     && jToke.keyWord() == JackTokenizer.keys.VAR) {
                 compileVarDec();
             }
+
+            VMwriter.writeFunction(funcName, sTable.VarCount(sTable.toKind("VAR")));
 
 
             while (jToke.tokenType() == JackTokenizer.types.KEYWORD &&
@@ -806,6 +811,7 @@ public class CompilationEngine {
                         case "method":
                         case "constructor":
                         case "function":
+                            funcName = name;
                             name = "this";
                             sTable.Define(name, className, SymbolTable.Kind.ARG);
                             break;
