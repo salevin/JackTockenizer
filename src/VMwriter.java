@@ -29,7 +29,6 @@ public class VMwriter {
         System.out.println(className);
     }
 
-
     public enum Segment{
         CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
     }
@@ -46,23 +45,43 @@ public class VMwriter {
     }
 
     public void writeArithmetic(Command command){
-       //TODO
+        try{
+            writer.write(command.toString());
+        }catch (IOException x) {
+            err.println(x);
+        }
     }
 
     public void writeLabel(String label){
-        //TODO
+        try{
+            writer.write(label);
+        }catch (IOException x) {
+            err.println(x);
+        }
     }
 
     public void writeGoto(String str){
-        //TODO
+        try{
+            writer.write("goto " + str + "\n");
+        }catch (IOException e) {
+            err.println(e);
+        }
     }
 
     public void writeIf(String str){
-        //TODO
+        try{
+            writer.write("if-goto " + str + "\n");
+        }catch (IOException e) {
+            err.println(e);
+        }
     }
 
     public void writeCall(String name, int nArgs){
-        //TODO
+        try{
+            writer.write(String.format("call %s %d\n", name, nArgs));
+        }catch (IOException e) {
+            err.println(e);
+        }
     }
 
     public void writeFunction(String name, int nLocals){
@@ -82,7 +101,11 @@ public class VMwriter {
     }
 
     public void writeReturn(){
-        //TODO
+        try{
+            writer.write("return\n");
+        }catch (IOException e) {
+            err.println(e);
+        }
     }
 
     public void setConstructor(int num){
