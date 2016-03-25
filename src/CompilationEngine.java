@@ -15,6 +15,7 @@ public class CompilationEngine {
     private String className;
     private String savedTokeType;
     private boolean prevWritten;
+    private VMwriter VMwriter;
 
     public CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
@@ -26,6 +27,7 @@ public class CompilationEngine {
         } catch (IOException x) {
             err.println(x);
         }
+        VMwriter = new VMwriter(outputPath.substring(0, outputPath.length() - 4) + ".vm1", className);
     }
 
     public void compileClass() {
@@ -37,7 +39,7 @@ public class CompilationEngine {
             key = jToke.keyWord();
 
             if (key == JackTokenizer.keys.CLASS) {
-//                writeCurrToke();
+                writeCurrToke();
             } else {
                 err.println("No class dec!");
                 exit(0);
@@ -47,7 +49,7 @@ public class CompilationEngine {
 
             if (jToke.tokenType() == JackTokenizer.types.IDENTIFIER) {
                 className = currToke();
-//                writeCurrToke();
+                writeCurrToke();
             } else {
                 err.println("No class dec!");
                 exit(0);
@@ -56,7 +58,7 @@ public class CompilationEngine {
             realAdvance();
 
             if (currToke().equals("{")) {
-//                writeCurrToke();
+                writeCurrToke();
             } else {
                 err.println("incorrect format!");
                 exit(0);
@@ -85,8 +87,8 @@ public class CompilationEngine {
             }
 
             if (currToke().equals("}")) {
-//                writeCurrToke();
-//                writer.write("</class>\n");
+                writeCurrToke();
+                writer.write("</class>\n");
 
             } else {
                 err.println("incorrect format! compileClass");
@@ -325,7 +327,7 @@ public class CompilationEngine {
                         realAdvance();
                         break;
                     default:
-                        System.err.println("compileStatements problemo");
+                        err.println("compileStatements problemo");
                         exit(0);
                 }
             }
@@ -507,6 +509,7 @@ public class CompilationEngine {
                 compileStatements();
 
                 writeCurrToke();
+                realAdvance();
             }
 
             writer.write("</ifStatement>\n");
