@@ -1,5 +1,3 @@
-import com.sun.xml.internal.bind.v2.TODO;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,6 +13,8 @@ public class VMwriter {
 
     private BufferedWriter writer;
     private String className;
+    private boolean constructor;
+    private int fields;
 
     public VMwriter(String outputPath) {
         try {
@@ -24,6 +24,7 @@ public class VMwriter {
         }
 
         className = outputPath.substring(outputPath.lastIndexOf("/") + 1,outputPath.length());
+        constructor = false;
 
         System.out.println(className);
     }
@@ -69,6 +70,11 @@ public class VMwriter {
             writer.write("function " + className + "." + name + " " +
                     + nLocals + "\n");
 
+            if (constructor){
+                writer.write("push constant "  + fields +
+                        "\ncall Memory.alloc 1\n");
+                constructor = false;
+            }
 
         } catch (IOException e) {
             err.println(e);
@@ -77,6 +83,11 @@ public class VMwriter {
 
     public void writeReturn(){
         //TODO
+    }
+
+    public void setConstructor(int num){
+        constructor = true;
+        fields = num;
     }
 
     public void close(){

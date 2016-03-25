@@ -808,8 +808,9 @@ public class CompilationEngine {
                         case ",":
                             sTable.Define(name, prevTwo[0], SymbolTable.Kind.ARG);
                             break;
-                        case "method":
                         case "constructor":
+                            VMwriter.setConstructor(sTable.VarCount(sTable.toKind("FIELD")));
+                        case "method":
                         case "function":
                             funcName = name;
                             name = "this";
