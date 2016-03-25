@@ -101,7 +101,10 @@ public class VMwriter {
                 writer.write("push constant "  + fields +
                         "\ncall Memory.alloc 1\n");
                 constructor = false;
+            } else {
+                writer.write("push argument 0\n");
             }
+            writer.write("pop pointer 0\n");
 
         } catch (IOException e) {
             err.println(e);
