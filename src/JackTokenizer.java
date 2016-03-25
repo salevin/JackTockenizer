@@ -38,10 +38,8 @@ public class JackTokenizer {
             if (curr_char != -1 && !Character.isWhitespace(curr_char)) {
                 rd.unread(curr_char);
                 return true;
-            } else if (Character.isWhitespace(curr_char)){
-                return hasMoreTokens();
-            }
-            else return false;
+            } else
+                return Character.isWhitespace(curr_char) && hasMoreTokens();
         } catch (IOException x) {
             System.err.println(x);
             return false;
@@ -94,7 +92,6 @@ public class JackTokenizer {
                 token = "";
                 token = advanceString(token);
                 curr_tokenType = types.STRING_CONST;
-                return;
             }
 
         } catch (IOException x) {
