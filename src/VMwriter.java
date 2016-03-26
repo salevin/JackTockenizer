@@ -95,6 +95,10 @@ public class VMwriter {
             writer.write("function " + className + "." + name + " " +
                     + nLocals + "\n");
 
+            if (name.equals("main")){
+                return;
+            }
+
             if (constructor){
                 writer.write("push constant "  + fields +
                         "\ncall Memory.alloc 1\n");
