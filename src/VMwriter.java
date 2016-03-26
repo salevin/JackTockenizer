@@ -25,8 +25,6 @@ public class VMwriter {
 
         className = outputPath.substring(outputPath.lastIndexOf("/") + 1,outputPath.length());
         constructor = false;
-
-        System.out.println(className);
     }
 
     public enum Segment{

@@ -15,6 +15,8 @@ public class CompilationEngine {
     private String className;
     private String savedTokeType;
     private String funcName;
+    private String vmName;
+    private int vmArgs;
     private boolean prevWritten;
     private VMwriter VMwriter;
 
@@ -24,6 +26,7 @@ public class CompilationEngine {
         prevTwo = new String[]{"", ""};
         className = "";
         funcName = "";
+        vmArgs = 0;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
         } catch (IOException x) {
@@ -355,6 +358,7 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileDo()");
                 exit(0);
             }
+            VMwriter.writeCall(vmName,vmArgs);
             writeCurrToke();
 
             writer.write("</doStatement>\n");
@@ -592,6 +596,8 @@ public class CompilationEngine {
                             break;
                         case IDENTIFIER:
                             saveCurrToke();
+                            vmName = currToke();
+                            vmArgs = 0;
                             realAdvance();
                             // Remember that you have to save the token
                             if (currToke().equals("[")) {
@@ -608,6 +614,7 @@ public class CompilationEngine {
                             } else if (currToke().equals("(")
                                     || currToke().equals(".")) {
                                 compileSubroutineCall(true);
+                                VMwriter.writeCall(vmName, vmArgs);
                             } else {
                                 writeSavedToke();
                             }
@@ -629,6 +636,8 @@ public class CompilationEngine {
             writeSavedToke();
         } else {
             writeCurrToke();
+            vmName = currToke();
+            vmArgs = 0;
             realAdvance();
         }
 
@@ -646,12 +655,14 @@ public class CompilationEngine {
                 break;
             case ".":
                 writeCurrToke();
+                vmName += currToke();
                 realAdvance();
                 if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
                     err.println("incorrect format! in compileSubroutineCall()");
                     exit(0);
                 }
                 writeCurrToke();
+                vmName += currToke();
                 realAdvance();
                 if (!currToke().equals("(")) {
                     err.println("incorrect format! in compileSubroutineCall()");
@@ -679,6 +690,7 @@ public class CompilationEngine {
         try {
             writer.write("<expressionList>\n");
             if (!currToke().equals(")")) {
+                vmArgs += 1;
                 compileExpression();
                 while (!currToke().equals(")")) {
                     if (!currToke().equals(",")) {
@@ -686,6 +698,7 @@ public class CompilationEngine {
                         exit(0);
                     }
                     writeCurrToke();
+                    vmArgs += 1;
                     realAdvance();
                     compileExpression();
                 }
