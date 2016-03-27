@@ -104,8 +104,10 @@ public class VMwriter {
         }
     }
 
-    public void writeReturn() {
+    public void writeReturn(boolean isVoid) {
         try {
+            if (isVoid)
+                writer.write("push constant 0\n");
             writer.write("return\n");
         } catch (IOException e) {
             err.println(e);

@@ -1,3 +1,5 @@
+import sun.misc.VM;
+
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +24,7 @@ public class CompilationEngine {
     private String vmName;
     private int vmArgs;
     private boolean prevWritten;
-    private int gotoIndex;
+    private int whileIndex;
     private int ifIndex;
     private VMwriter VMwriter;
 
@@ -31,7 +33,7 @@ public class CompilationEngine {
         sTable = new SymbolTable();
         prevTwo = new String[]{"", ""};
         className = funcName = "";
-        vmArgs = gotoIndex = ifIndex = 0;
+        vmArgs = whileIndex = ifIndex = 0;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
         } catch (IOException x) {
@@ -151,7 +153,7 @@ public class CompilationEngine {
     public void compileSubroutineDec() {
         try {
             sTable.startSubroutine();
-            gotoIndex = ifIndex = 0;
+            whileIndex = ifIndex = 0;
             writer.write("<subroutineDec>\n");
             writeCurrToke();
             realAdvance();
@@ -428,8 +430,14 @@ public class CompilationEngine {
     public void compileWhile() {
         try {
             writer.write("<whileStatement>\n");
+
+            int currWhileIndex = whileIndex;
+            whileIndex++;
+
             writeCurrToke();
             realAdvance();
+
+            VMwriter.writeLabel("WHILE_EXP" + currWhileIndex);
 
             if (!currToke().equals("(")) {
                 err.println("incorrect format! in compileWhile() 1");
@@ -444,6 +452,9 @@ public class CompilationEngine {
             }
             writeCurrToke();
             realAdvance();
+
+            VMwriter.writeIf("WHILE_END" + currWhileIndex);
+
             if (!currToke().equals("{")) {
                 err.println("incorrect format! in compileWhile() 3");
                 exit(0);
@@ -455,6 +466,10 @@ public class CompilationEngine {
             compileStatements();
 
             writeCurrToke();
+
+            VMwriter.writeGoto("WHILE_EXP" + currWhileIndex);
+            VMwriter.writeLabel("WHILE_END" + currWhileIndex);
+
             writer.write("</whileStatement>\n");
 
 
@@ -471,7 +486,9 @@ public class CompilationEngine {
 
             if (!currToke().equals(";")) {
                 compileExpression();
+                VMwriter.writeReturn(false);
             }
+            else VMwriter.writeReturn(true);
 
             writeCurrToke();
             writer.write("</returnStatement>\n");
