@@ -1,5 +1,3 @@
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Objects;
 
@@ -8,13 +6,8 @@ import java.util.Objects;
  */
 public class SymbolTable {
 
-    public enum Kind {
-        STATIC, FIELD, VAR, ARG, NONE
-    }
-
     private static Hashtable<String, String[]> classScope;
     private static Hashtable<String, String[]> subroutineScope;
-
     public SymbolTable() {
         classScope = new Hashtable<>();
         subroutineScope = new Hashtable<>();
@@ -84,7 +77,7 @@ public class SymbolTable {
             return subroutineScope.get(name)[0];
     }
 
-    public int IndexOf(String name){
+    public int IndexOf(String name) {
         if (classScope.containsKey(name))
             return Integer.parseInt(classScope.get(name)[2]);
         else if (subroutineScope.containsKey(name))
@@ -99,6 +92,10 @@ public class SymbolTable {
                 return kind;
         }
         return Kind.NONE;
+    }
+
+    public enum Kind {
+        STATIC, FIELD, VAR, ARG, NONE
     }
 
 }

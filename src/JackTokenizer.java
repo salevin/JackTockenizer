@@ -1,4 +1,6 @@
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PushbackReader;
 
 /**
  * Created by sam on 2/2/16.
@@ -13,15 +15,6 @@ public class JackTokenizer {
 
     private keys curr_keyWord;
 
-    public enum types {
-        KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, COMMENT
-    }
-
-    public enum keys {
-        CLASS, METHOD, FUNCTION, CONSTRUCTOR, INT, BOOLEAN, CHAR, VOID, VAR, STATIC, FIELD, LET,
-        DO, IF, ELSE, WHILE, RETURN, TRUE, FALSE, NULL, THIS
-    }
-
     public JackTokenizer(String inputFile) {
         try {
             rd = new PushbackReader(
@@ -30,7 +23,6 @@ public class JackTokenizer {
             System.err.println(x);
         }
     }
-
 
     public boolean hasMoreTokens() {
         try {
@@ -45,7 +37,6 @@ public class JackTokenizer {
             return false;
         }
     }
-
 
     public void advance() {
         try {
@@ -151,7 +142,7 @@ public class JackTokenizer {
         }
     }
 
-    public String returnToken(){
+    public String returnToken() {
         return token;
     }
 
@@ -242,7 +233,6 @@ public class JackTokenizer {
         }
     }
 
-
     public void advanceBlock() {
         try {
             curr_tokenType = types.COMMENT;
@@ -255,6 +245,16 @@ public class JackTokenizer {
         } catch (IOException x) {
             System.err.println(x);
         }
+    }
+
+    public enum types {
+        KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, COMMENT
+    }
+
+
+    public enum keys {
+        CLASS, METHOD, FUNCTION, CONSTRUCTOR, INT, BOOLEAN, CHAR, VOID, VAR, STATIC, FIELD, LET,
+        DO, IF, ELSE, WHILE, RETURN, TRUE, FALSE, NULL, THIS
     }
 
 }

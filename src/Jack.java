@@ -1,7 +1,4 @@
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 
 public class Jack {
 
@@ -16,22 +13,22 @@ public class Jack {
 
         CompilationEngine compiler = null;
 
-        if (directory.isDirectory()){
+        if (directory.isDirectory()) {
             String fileName = directory.getName();
             files = directory.list();
-        }else{
+        } else {
             files[0] = directory.getName();
             path = directory.getParent();
         }
 
-        for (String inputFile: files){
+        for (String inputFile : files) {
             System.out.println(inputFile);
             int period = inputFile.indexOf('.');
-            String extension = inputFile.substring(period+1);
+            String extension = inputFile.substring(period + 1);
             String file = inputFile.substring(0, period);
 
-            if (extension.equals("jack")){
-                compiler = new CompilationEngine(path+"/"+inputFile, path+"/"+file+".xml");
+            if (extension.equals("jack")) {
+                compiler = new CompilationEngine(path + "/" + inputFile, path + "/" + file + ".xml");
                 compiler.compileClass();
             }
 

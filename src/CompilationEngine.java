@@ -1,6 +1,10 @@
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
-import static java.lang.System.*;
+import static java.lang.System.err;
+import static java.lang.System.exit;
 
 /**
  * Created by sam on 2/2/16.
@@ -358,7 +362,7 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileDo()");
                 exit(0);
             }
-            VMwriter.writeCall(vmName,vmArgs);
+            VMwriter.writeCall(vmName, vmArgs);
             writeCurrToke();
 
             writer.write("</doStatement>\n");

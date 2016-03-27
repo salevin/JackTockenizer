@@ -23,84 +23,77 @@ public class VMwriter {
             err.println(x);
         }
 
-        className = outputPath.substring(outputPath.lastIndexOf("/") + 1,outputPath.length());
+        className = outputPath.substring(outputPath.lastIndexOf("/") + 1, outputPath.length());
         constructor = false;
     }
 
-    public enum Segment{
-        CONSTANT, ARGUMENT, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
-    }
-    public enum Command{
-        ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT
-    }
-
-    public void writePush(Segment seg, int index ){
-        try{
+    public void writePush(Segment seg, int index) {
+        try {
             writer.write(String.format("push %s %d\n", seg.toString(), index));
-        }catch (IOException e) {
+        } catch (IOException e) {
             err.println(e);
         }
     }
 
-    public void writePop(Segment seg, int index){
-        try{
+    public void writePop(Segment seg, int index) {
+        try {
             writer.write(String.format("pop %s %d\n", seg.toString().toLowerCase(), index));
-        }catch (IOException e) {
+        } catch (IOException e) {
             err.println(e);
         }
     }
 
-    public void writeArithmetic(Command command){
-        try{
+    public void writeArithmetic(Command command) {
+        try {
             writer.write(command.toString());
-        }catch (IOException x) {
+        } catch (IOException x) {
             err.println(x);
         }
     }
 
-    public void writeLabel(String label){
-        try{
+    public void writeLabel(String label) {
+        try {
             writer.write(label);
-        }catch (IOException x) {
+        } catch (IOException x) {
             err.println(x);
         }
     }
 
-    public void writeGoto(String str){
-        try{
+    public void writeGoto(String str) {
+        try {
             writer.write("goto " + str + "\n");
-        }catch (IOException e) {
+        } catch (IOException e) {
             err.println(e);
         }
     }
 
-    public void writeIf(String str){
-        try{
+    public void writeIf(String str) {
+        try {
             writer.write("if-goto " + str + "\n");
-        }catch (IOException e) {
+        } catch (IOException e) {
             err.println(e);
         }
     }
 
-    public void writeCall(String name, int nArgs){
-        try{
+    public void writeCall(String name, int nArgs) {
+        try {
             writer.write(String.format("call %s %d\n", name, nArgs));
-        }catch (IOException e) {
+        } catch (IOException e) {
             err.println(e);
         }
     }
 
-    public void writeFunction(String name, int nLocals){
+    public void writeFunction(String name, int nLocals) {
         try {
             writer.write("function " + className + "." + name + " " +
-                    + nLocals + "\n");
+                    +nLocals + "\n");
 
-            if (name.equals("main")){
+            if (name.equals("main")) {
                 return;
             }
 
-            if (constructor){
-                writer.write("push constant "  + fields +
+            if (constructor) {
+                writer.write("push constant " + fields +
                         "\ncall Memory.alloc 1\n");
                 constructor = false;
             } else {
@@ -113,20 +106,20 @@ public class VMwriter {
         }
     }
 
-    public void writeReturn(){
-        try{
+    public void writeReturn() {
+        try {
             writer.write("return\n");
-        }catch (IOException e) {
+        } catch (IOException e) {
             err.println(e);
         }
     }
 
-    public void setConstructor(int num){
+    public void setConstructor(int num) {
         constructor = true;
         fields = num;
     }
 
-    Segment toSegment(String seg){
+    Segment toSegment(String seg) {
         switch (seg) {
             case "FIELD":
             case "STATIC":
@@ -152,7 +145,7 @@ public class VMwriter {
         }
     }
 
-    public void close(){
+    public void close() {
         try {
             writer.close();
         } catch (IOException e) {
@@ -160,7 +153,13 @@ public class VMwriter {
         }
     }
 
-
-
-
+    public enum Segment {
+        CONSTANT, ARGUMENT, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
     }
+
+    public enum Command {
+        ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT
+    }
+
+
+}
