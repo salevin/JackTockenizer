@@ -53,7 +53,7 @@ public class VMwriter {
 
     public void writeLabel(String label) {
         try {
-            writer.write(label);
+            writer.write(String.format("label %s\n", label));
         } catch (IOException x) {
             err.println(x);
         }
@@ -61,7 +61,7 @@ public class VMwriter {
 
     public void writeGoto(String str) {
         try {
-            writer.write("goto " + str + "\n");
+            writer.write(String.format("goto %s\n", str));
         } catch (IOException e) {
             err.println(e);
         }
@@ -69,7 +69,7 @@ public class VMwriter {
 
     public void writeIf(String str) {
         try {
-            writer.write("if-goto " + str + "\n");
+            writer.write(String.format("if-goto %s\n", str));
         } catch (IOException e) {
             err.println(e);
         }
@@ -77,7 +77,7 @@ public class VMwriter {
 
     public void writeCall(String name, int nArgs) {
         try {
-            writer.write(String.format("call %s %d\n", name, nArgs));
+            writer.write(String.format("call %s %d\npop temp 0\n", name, nArgs));
         } catch (IOException e) {
             err.println(e);
         }
@@ -85,16 +85,14 @@ public class VMwriter {
 
     public void writeFunction(String name, int nLocals) {
         try {
-            writer.write("function " + className + "." + name + " " +
-                    +nLocals + "\n");
+            writer.write(String.format("function %s.%s %d\n", className, name, +nLocals));
 
             if (name.equals("main")) {
                 return;
             }
 
             if (constructor) {
-                writer.write("push constant " + fields +
-                        "\ncall Memory.alloc 1\n");
+                writer.write(String.format("push constant %d\ncall Memory.alloc 1\n", fields));
                 constructor = false;
             } else {
                 writer.write("push argument 0\n");

@@ -22,15 +22,16 @@ public class CompilationEngine {
     private String vmName;
     private int vmArgs;
     private boolean prevWritten;
+    private int gotoIndex;
+    private int ifIndex;
     private VMwriter VMwriter;
 
     public CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
         sTable = new SymbolTable();
         prevTwo = new String[]{"", ""};
-        className = "";
-        funcName = "";
-        vmArgs = 0;
+        className = funcName = "";
+        vmArgs = gotoIndex = ifIndex = 0;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
         } catch (IOException x) {
@@ -150,6 +151,7 @@ public class CompilationEngine {
     public void compileSubroutineDec() {
         try {
             sTable.startSubroutine();
+            gotoIndex = ifIndex = 0;
             writer.write("<subroutineDec>\n");
             writeCurrToke();
             realAdvance();
@@ -481,6 +483,8 @@ public class CompilationEngine {
     public void compileIf() {
         try {
             writer.write("<ifStatement>\n");
+            int currIndex = ifIndex;
+            ifIndex++;
             writeCurrToke();
             realAdvance();
             if (!currToke().equals("(")) {
@@ -494,6 +498,9 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileIf() 2");
                 exit(0);
             }
+            VMwriter.writeIf("IF_TRUE" + currIndex);
+            VMwriter.writeGoto("IF_FALSE" + currIndex);
+            VMwriter.writeLabel("IF_TRUE" + currIndex);
             writeCurrToke();
             realAdvance();
             if (!currToke().equals("{")) {
@@ -508,6 +515,9 @@ public class CompilationEngine {
 
             writeCurrToke();
             realAdvance();
+
+            VMwriter.writeGoto("IF_END" + currIndex);
+            VMwriter.writeLabel("IF_FALSE" + currIndex);
 
             if (jToke.tokenType() == JackTokenizer.types.KEYWORD
                     && jToke.keyWord() == JackTokenizer.keys.ELSE) {
@@ -528,6 +538,7 @@ public class CompilationEngine {
                 realAdvance();
             }
 
+            VMwriter.writeLabel("IF_END" + currIndex);
             writer.write("</ifStatement>\n");
 
         } catch (IOException x) {
@@ -648,6 +659,8 @@ public class CompilationEngine {
         switch (currToke()) {
             case "(":
                 writeCurrToke();
+                vmName = className + "." + vmName;
+                vmArgs++;
                 realAdvance();
                 compileExpressionList();
                 if (!currToke().equals(")")) {
