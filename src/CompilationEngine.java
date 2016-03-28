@@ -1,5 +1,3 @@
-import sun.misc.VM;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +24,7 @@ public class CompilationEngine {
     private boolean prevWritten;
     private int whileIndex;
     private int ifIndex;
-    private VMwriter VMwriter;
+    private VMwriter VMwrite;
 
     public CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
@@ -39,7 +37,7 @@ public class CompilationEngine {
         } catch (IOException x) {
             err.println(x);
         }
-        VMwriter = new VMwriter(outputPath.substring(0, outputPath.length() - 4));
+        VMwrite = new VMwriter(outputPath.substring(0, outputPath.length() - 4));
     }
 
     public void compileClass() {
@@ -107,7 +105,7 @@ public class CompilationEngine {
                 exit(0);
             }
             writer.close();
-            VMwriter.close();
+            VMwrite.close();
         } catch (IOException x) {
             err.println(x);
         }
@@ -217,7 +215,7 @@ public class CompilationEngine {
                 compileVarDec();
             }
 
-            VMwriter.writeFunction(funcName, sTable.VarCount(sTable.toKind("VAR")));
+            VMwrite.writeFunction(funcName, sTable.VarCount(sTable.toKind("VAR")));
 
 
             while (jToke.tokenType() == JackTokenizer.types.KEYWORD &&
@@ -366,7 +364,7 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileDo()");
                 exit(0);
             }
-            VMwriter.writeCall(vmName, vmArgs);
+            VMwrite.writeCall(vmName, vmArgs);
             writeCurrToke();
 
             writer.write("</doStatement>\n");
@@ -417,7 +415,7 @@ public class CompilationEngine {
                 exit(0);
             }
 
-            VMwriter.writePop(VMwriter.toSegment(sTable.KindOf(pop).toString()), sTable.IndexOf(pop));
+            VMwrite.writePop(VMwrite.toSegment(sTable.KindOf(pop).toString()), sTable.IndexOf(pop));
 
             writer.write("</letStatement>\n");
 
@@ -437,7 +435,7 @@ public class CompilationEngine {
             writeCurrToke();
             realAdvance();
 
-            VMwriter.writeLabel("WHILE_EXP" + currWhileIndex);
+            VMwrite.writeLabel("WHILE_EXP" + currWhileIndex);
 
             if (!currToke().equals("(")) {
                 err.println("incorrect format! in compileWhile() 1");
@@ -453,7 +451,8 @@ public class CompilationEngine {
             writeCurrToke();
             realAdvance();
 
-            VMwriter.writeIf("WHILE_END" + currWhileIndex);
+            VMwrite.writeArithmetic(VMwriter.Command.NOT);
+            VMwrite.writeIf("WHILE_END" + currWhileIndex);
 
             if (!currToke().equals("{")) {
                 err.println("incorrect format! in compileWhile() 3");
@@ -467,8 +466,8 @@ public class CompilationEngine {
 
             writeCurrToke();
 
-            VMwriter.writeGoto("WHILE_EXP" + currWhileIndex);
-            VMwriter.writeLabel("WHILE_END" + currWhileIndex);
+            VMwrite.writeGoto("WHILE_EXP" + currWhileIndex);
+            VMwrite.writeLabel("WHILE_END" + currWhileIndex);
 
             writer.write("</whileStatement>\n");
 
@@ -486,9 +485,9 @@ public class CompilationEngine {
 
             if (!currToke().equals(";")) {
                 compileExpression();
-                VMwriter.writeReturn(false);
+                VMwrite.writeReturn(false);
             }
-            else VMwriter.writeReturn(true);
+            else VMwrite.writeReturn(true);
 
             writeCurrToke();
             writer.write("</returnStatement>\n");
@@ -515,9 +514,9 @@ public class CompilationEngine {
                 err.println("incorrect format! in compileIf() 2");
                 exit(0);
             }
-            VMwriter.writeIf("IF_TRUE" + currIndex);
-            VMwriter.writeGoto("IF_FALSE" + currIndex);
-            VMwriter.writeLabel("IF_TRUE" + currIndex);
+            VMwrite.writeIf("IF_TRUE" + currIndex);
+            VMwrite.writeGoto("IF_FALSE" + currIndex);
+            VMwrite.writeLabel("IF_TRUE" + currIndex);
             writeCurrToke();
             realAdvance();
             if (!currToke().equals("{")) {
@@ -533,8 +532,8 @@ public class CompilationEngine {
             writeCurrToke();
             realAdvance();
 
-            VMwriter.writeGoto("IF_END" + currIndex);
-            VMwriter.writeLabel("IF_FALSE" + currIndex);
+            VMwrite.writeGoto("IF_END" + currIndex);
+            VMwrite.writeLabel("IF_FALSE" + currIndex);
 
             if (jToke.tokenType() == JackTokenizer.types.KEYWORD
                     && jToke.keyWord() == JackTokenizer.keys.ELSE) {
@@ -555,7 +554,7 @@ public class CompilationEngine {
                 realAdvance();
             }
 
-            VMwriter.writeLabel("IF_END" + currIndex);
+            VMwrite.writeLabel("IF_END" + currIndex);
             writer.write("</ifStatement>\n");
 
         } catch (IOException x) {
@@ -570,9 +569,22 @@ public class CompilationEngine {
             compileTerm();
 
             while ("s+-*/&|<>=".contains(jToke.returnToken())) {
+                String toke = jToke.returnToken();
+
                 writeCurrToke();
                 realAdvance();
                 compileTerm();
+                switch (toke){
+                    case "*":
+                        VMwrite.writeCall("Math.multiply", 2);
+                        break;
+                    case "/":
+                        VMwrite.writeCall("Math.divide", 2);
+                        break;
+                    default:
+                        VMwrite.writeArithmetic(VMwrite.toCommand(toke));
+                        break;
+                }
             }
 
 
@@ -601,24 +613,36 @@ public class CompilationEngine {
                     break;
                 case "-":
                 case "~":
+                    String arith = currToke();
                     writeCurrToke();
                     realAdvance();
                     compileTerm();
+                    VMwrite.writeArithmetic(VMwrite.toCommand(arith));
                     break;
                 default:
                     switch (jToke.tokenType()) {
                         case KEYWORD:
-                            if (jToke.keyWord() != JackTokenizer.keys.TRUE
-                                    && jToke.keyWord() != JackTokenizer.keys.FALSE
-                                    && jToke.keyWord() != JackTokenizer.keys.NULL
-                                    && jToke.keyWord() != JackTokenizer.keys.THIS) {
-                                err.println("incorrect format! in compileTerm()");
-                                exit(0);
+                            switch (jToke.keyWord()){
+                                case TRUE:
+                                    VMwrite.writePush(VMwriter.Segment.CONSTANT, 1);
+                                    VMwrite.writeArithmetic(VMwriter.Command.NOT);
+                                    break;
+                                case FALSE:
+                                case NULL:
+                                    VMwrite.writePush(VMwriter.Segment.CONSTANT, 0);
+                                    break;
+                                case THIS:
+                                    VMwrite.writePush(VMwriter.Segment.POINTER, 0);
+                                    break;
+                                default:
+                                    err.println("incorrect format! in compileTerm()");
+                                    exit(0);
                             }
                             writeCurrToke();
                             realAdvance();
                             break;
                         case INT_CONST:
+                            VMwrite.writePush(VMwriter.Segment.CONSTANT, Integer.valueOf(currToke()));
                             writeCurrToke();
                             realAdvance();
                             break;
@@ -646,7 +670,7 @@ public class CompilationEngine {
                             } else if (currToke().equals("(")
                                     || currToke().equals(".")) {
                                 compileSubroutineCall(true);
-                                VMwriter.writeCall(vmName, vmArgs);
+                                VMwrite.writeCall(vmName, vmArgs);
                             } else {
                                 writeSavedToke();
                             }
@@ -859,7 +883,7 @@ public class CompilationEngine {
                             sTable.Define(name, prevTwo[0], SymbolTable.Kind.ARG);
                             break;
                         case "constructor":
-                            VMwriter.setConstructor(sTable.VarCount(sTable.toKind("FIELD")));
+                            VMwrite.setConstructor(sTable.VarCount(sTable.toKind("FIELD")));
                         case "method":
                         case "function":
                             funcName = name;

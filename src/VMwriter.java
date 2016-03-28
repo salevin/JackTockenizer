@@ -1,7 +1,4 @@
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 import static java.lang.System.err;
 
@@ -29,7 +26,7 @@ public class VMwriter {
 
     public void writePush(Segment seg, int index) {
         try {
-            writer.write(String.format("push %s %d\n", seg.toString(), index));
+            writer.write(String.format("push %s %d\n", seg.toString().toLowerCase(), index));
         } catch (IOException e) {
             err.println(e);
         }
@@ -45,7 +42,7 @@ public class VMwriter {
 
     public void writeArithmetic(Command command) {
         try {
-            writer.write(command.toString());
+            writer.write(command.toString().toLowerCase() + "\n");
         } catch (IOException x) {
             err.println(x);
         }
@@ -141,6 +138,30 @@ public class VMwriter {
                 return Segment.CONSTANT;
             default:
                 err.println("no such segment");
+                return null;
+        }
+    }
+
+    Command toCommand(String com) {
+        switch (com) {
+            case "<":
+                return Command.LT;
+            case ">":
+                return Command.GT;
+            case "-":
+                return Command.SUB;
+            case "=":
+                return Command.EQ;
+            case "|":
+                return Command.OR;
+            case "+":
+                return Command.ADD;
+            case "~":
+                return Command.NOT;
+            case "&":
+                return Command.AND;
+            default:
+                err.println("no such command");
                 return null;
         }
     }
