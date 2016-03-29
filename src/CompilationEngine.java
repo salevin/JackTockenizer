@@ -1,3 +1,5 @@
+import sun.misc.VM;
+
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -655,6 +657,13 @@ public class CompilationEngine {
                             break;
                         case STRING_CONST:
                             writeCurrToke();
+                            VMwrite.writePush(VMwriter.Segment.CONSTANT, currToke().length());
+                            VMwrite.writeCall("String.new", 1);
+                            for(int i = 0; i<currToke().length(); i++){
+                                VMwrite.writePush(VMwriter.Segment.CONSTANT, (int) currToke().charAt(i));
+                                VMwrite.writeCall("String.appendChar", 2);
+                            }
+
                             realAdvance();
                             break;
                         case IDENTIFIER:
