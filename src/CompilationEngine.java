@@ -537,11 +537,13 @@ public class CompilationEngine {
             writeCurrToke();
             realAdvance();
 
-            VMwrite.writeGoto("IF_END" + currIndex);
-            VMwrite.writeLabel("IF_FALSE" + currIndex);
 
             if (jToke.tokenType() == JackTokenizer.types.KEYWORD
                     && jToke.keyWord() == JackTokenizer.keys.ELSE) {
+
+                VMwrite.writeGoto("IF_END" + currIndex);
+                VMwrite.writeLabel("IF_FALSE" + currIndex);
+
                 writeCurrToke();
                 realAdvance();
 
@@ -557,9 +559,9 @@ public class CompilationEngine {
 
                 writeCurrToke();
                 realAdvance();
-            }
+                VMwrite.writeLabel("IF_END" + currIndex);
+            } else VMwrite.writeLabel("IF_FALSE" + currIndex);
 
-            VMwrite.writeLabel("IF_END" + currIndex);
             writer.write("</ifStatement>\n");
 
         } catch (IOException x) {
