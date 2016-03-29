@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 
 import static java.lang.System.err;
 import static java.lang.System.exit;
+import static java.lang.System.in;
 
 /**
  * Created by sam on 2/2/16.
@@ -367,6 +368,8 @@ public class CompilationEngine {
             VMwrite.writeCall(vmName, vmArgs);
             writeCurrToke();
 
+            VMwrite.writePop(VMwriter.Segment.TEMP, 0);
+
             writer.write("</doStatement>\n");
 
         } catch (IOException x) {
@@ -597,6 +600,10 @@ public class CompilationEngine {
     }
 
     public void compileTerm() {
+
+        String name;
+        int args;
+
         try {
             writer.write("<term>\n");
             switch (currToke()) {
@@ -652,8 +659,8 @@ public class CompilationEngine {
                             break;
                         case IDENTIFIER:
                             saveCurrToke();
-                            vmName = currToke();
-                            vmArgs = 0;
+                            name = currToke();
+                            args = 0;
                             realAdvance();
                             // Remember that you have to save the token
                             if (currToke().equals("[")) {
@@ -670,9 +677,13 @@ public class CompilationEngine {
                             } else if (currToke().equals("(")
                                     || currToke().equals(".")) {
                                 compileSubroutineCall(true);
-                                VMwrite.writeCall(vmName, vmArgs);
+                                VMwrite.writeCall(name, args);
                             } else {
                                 writeSavedToke();
+                                VMwriter.Segment seg =
+                                        VMwrite.toSegment(sTable.KindOf(name).toString());
+                                int index = sTable.IndexOf(name);
+                                VMwrite.writePush(seg, index);
                             }
 
                     }
@@ -884,6 +895,7 @@ public class CompilationEngine {
                             break;
                         case "constructor":
                             VMwrite.setConstructor(sTable.VarCount(sTable.toKind("FIELD")));
+                            return;
                         case "method":
                         case "function":
                             funcName = name;

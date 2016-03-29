@@ -74,7 +74,7 @@ public class VMwriter {
 
     public void writeCall(String name, int nArgs) {
         try {
-            writer.write(String.format("call %s %d\npop temp 0\n", name, nArgs));
+            writer.write(String.format("call %s %d\n", name, nArgs));
         } catch (IOException e) {
             err.println(e);
         }
