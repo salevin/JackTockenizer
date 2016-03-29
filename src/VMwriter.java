@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Objects;
 
 import static java.lang.System.err;
 
@@ -12,6 +13,7 @@ public class VMwriter {
     private String className;
     private boolean constructor;
     private int fields;
+    private boolean commandB = false;
 
     public VMwriter(String outputPath) {
         try {
@@ -33,6 +35,7 @@ public class VMwriter {
     }
 
     public void writePop(Segment seg, int index) {
+        commandB = false;
         try {
             writer.write(String.format("pop %s %d\n", seg.toString().toLowerCase(), index));
         } catch (IOException e) {
@@ -41,6 +44,7 @@ public class VMwriter {
     }
 
     public void writeArithmetic(Command command) {
+
         try {
             writer.write(command.toString().toLowerCase() + "\n");
         } catch (IOException x) {
@@ -49,6 +53,7 @@ public class VMwriter {
     }
 
     public void writeLabel(String label) {
+
         try {
             writer.write(String.format("label %s\n", label));
         } catch (IOException x) {
@@ -57,6 +62,7 @@ public class VMwriter {
     }
 
     public void writeGoto(String str) {
+
         try {
             writer.write(String.format("goto %s\n", str));
         } catch (IOException e) {
@@ -65,6 +71,7 @@ public class VMwriter {
     }
 
     public void writeIf(String str) {
+
         try {
             writer.write(String.format("if-goto %s\n", str));
         } catch (IOException e) {
@@ -73,6 +80,7 @@ public class VMwriter {
     }
 
     public void writeCall(String name, int nArgs) {
+        commandB = false;
         try {
             writer.write(String.format("call %s %d\n", name, nArgs));
         } catch (IOException e) {
@@ -81,6 +89,7 @@ public class VMwriter {
     }
 
     public void writeFunction(String name, int nLocals) {
+        commandB = false;
         try {
             writer.write(String.format("function %s.%s %d\n", className, name, +nLocals));
 
@@ -102,6 +111,7 @@ public class VMwriter {
     }
 
     public void writeReturn(boolean isVoid) {
+
         try {
             if (isVoid)
                 writer.write("push constant 0\n");
@@ -112,11 +122,13 @@ public class VMwriter {
     }
 
     public void setConstructor(int num) {
+        commandB = false;
         constructor = true;
         fields = num;
     }
 
     Segment toSegment(String seg) {
+
         switch (seg) {
             case "FIELD":
             case "STATIC":
@@ -143,22 +155,34 @@ public class VMwriter {
     }
 
     Command toCommand(String com) {
+
         switch (com) {
             case "<":
+                commandB = true;
                 return Command.LT;
             case ">":
+                commandB = true;
                 return Command.GT;
             case "-":
+                if (commandB) {
+                    return Command.NEG;
+                }
+                commandB = true;
                 return Command.SUB;
             case "=":
+                commandB = true;
                 return Command.EQ;
             case "|":
+                commandB = true;
                 return Command.OR;
             case "+":
+                commandB = true;
                 return Command.ADD;
             case "~":
+                commandB = true;
                 return Command.NOT;
             case "&":
+                commandB = true;
                 return Command.AND;
             default:
                 err.println("no such command");
