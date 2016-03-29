@@ -607,6 +607,7 @@ public class CompilationEngine {
 
         String name;
         int args;
+        String orignialName;
 
         try {
             writer.write("<term>\n");
@@ -635,7 +636,7 @@ public class CompilationEngine {
                         case KEYWORD:
                             switch (jToke.keyWord()){
                                 case TRUE:
-                                    VMwrite.writePush(VMwriter.Segment.CONSTANT, 1);
+                                    VMwrite.writePush(VMwriter.Segment.CONSTANT, 0);
                                     VMwrite.writeArithmetic(VMwriter.Command.NOT);
                                     break;
                                 case FALSE:
@@ -670,7 +671,7 @@ public class CompilationEngine {
                             break;
                         case IDENTIFIER:
                             saveCurrToke();
-                            name = currToke();
+                            orignialName = name = currToke();
                             args = 0;
                             realAdvance();
                             // Remember that you have to save the token
@@ -687,8 +688,14 @@ public class CompilationEngine {
                                 realAdvance();
                             } else if (currToke().equals("(")
                                     || currToke().equals(".")) {
+                                vmArgs = args;
+                                vmName = name;
                                 compileSubroutineCall(true);
-                                VMwrite.writeCall(name, args);
+                                int index = sTable.IndexOf(orignialName);
+                                if (index != -1) {
+                                    VMwrite.writePush(VMwrite.toSegment(sTable.KindOf(orignialName).toString()), index);
+                                }
+                                VMwrite.writeCall(vmName, vmArgs);
                             } else {
                                 writeSavedToke();
                                 VMwriter.Segment seg =
@@ -722,6 +729,7 @@ public class CompilationEngine {
         switch (currToke()) {
             case "(":
                 writeCurrToke();
+                VMwrite.writePush(VMwriter.Segment.POINTER, 0);
                 vmName = className + "." + vmName;
                 vmArgs++;
                 realAdvance();
@@ -735,6 +743,11 @@ public class CompilationEngine {
                 break;
             case ".":
                 writeCurrToke();
+                if (sTable.IndexOf(vmName) != -1){
+                    VMwrite.writePush(VMwrite.toSegment(sTable.KindOf(vmName).toString()), sTable.IndexOf(vmName));
+                    vmName = sTable.TypeOf(vmName);
+                    vmArgs++;
+                }
                 vmName += currToke();
                 realAdvance();
                 if (jToke.tokenType() != JackTokenizer.types.IDENTIFIER) {
@@ -906,6 +919,7 @@ public class CompilationEngine {
                             break;
                         case "constructor":
                             VMwrite.setConstructor(sTable.VarCount(sTable.toKind("FIELD")));
+                            funcName = name;
                             return;
                         case "method":
                         case "function":
