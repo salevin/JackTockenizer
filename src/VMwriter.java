@@ -13,7 +13,8 @@ public class VMwriter {
     private String className;
     private boolean constructor;
     private int fields;
-    private boolean commandB = false;
+    private boolean commandB;
+    private String[] prevToken = {"","",""};
 
     public VMwriter(String outputPath) {
         try {
@@ -24,11 +25,13 @@ public class VMwriter {
 
         className = outputPath.substring(outputPath.lastIndexOf("/") + 1, outputPath.length());
         constructor = false;
+        commandB = false;
     }
 
     public void writePush(Segment seg, int index) {
         try {
             writer.write(String.format("push %s %d\n", seg.toString().toLowerCase(), index));
+            commandB = false;
         } catch (IOException e) {
             err.println(e);
         }
@@ -164,7 +167,7 @@ public class VMwriter {
                 commandB = true;
                 return Command.GT;
             case "-":
-                if (commandB) {
+                if (commandB || "{([,&|<>=~".contains(prevToken[2])) {
                     return Command.NEG;
                 }
                 commandB = true;
@@ -188,6 +191,12 @@ public class VMwriter {
                 err.println("no such command");
                 return null;
         }
+    }
+
+    public void setPrevToken(String prev){
+        prevToken[2] = prevToken[1];
+        prevToken[1] = prevToken[0];
+        prevToken[0] = prev;
     }
 
     public void close() {

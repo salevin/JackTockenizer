@@ -816,6 +816,7 @@ public class CompilationEngine {
         try {
             String tokenType = currTokeType();
 
+            VMwrite.setPrevToken(currToke());
 
             if (tokenType.equals("identifier") && sTable.IndexOf(currToke()) != -1) {
                 writeTable(false, currToke());
@@ -842,6 +843,8 @@ public class CompilationEngine {
 
     private void writeSavedToke() {
         try {
+
+            VMwrite.setPrevToken(currToke());
 
             if (savedTokeType.equals("identifier") && sTable.IndexOf(savedToken) != -1) {
                 writeTable(false, savedToken);
