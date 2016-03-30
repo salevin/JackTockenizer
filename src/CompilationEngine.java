@@ -938,7 +938,11 @@ public class CompilationEngine {
                             idKind = sTable.toKind(prevTwo[1]);
                             if (idKind != SymbolTable.Kind.NONE)
                                 sTable.Define(name, prevTwo[0], idKind);
-                            else return;
+                            else {
+                                prevTwo[1] = prevTwo[0];
+                                prevTwo[0] = name;
+                                return;
+                            }
                             prevWritten = true;
                             break;
                     }
