@@ -1,12 +1,14 @@
-import java.io.*;
-import java.util.Objects;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import static java.lang.System.err;
 
 /**
  * Created by john on 3/24/16.
  */
-public class VMwriter {
+class VMwriter {
 
 
     private BufferedWriter writer;
@@ -14,9 +16,9 @@ public class VMwriter {
     private boolean constructor;
     private int fields;
     private boolean commandB;
-    private String[] prevToken = {"","",""};
+    private String[] prevToken = {"", "", ""};
 
-    public VMwriter(String outputPath) {
+    VMwriter(String outputPath) {
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath + ".vm1")));
         } catch (IOException x) {
@@ -28,7 +30,7 @@ public class VMwriter {
         commandB = false;
     }
 
-    public void writePush(Segment seg, int index) {
+    void writePush(Segment seg, int index) {
         try {
             writer.write(String.format("push %s %d\n", seg.toString().toLowerCase(), index));
             commandB = false;
@@ -37,7 +39,7 @@ public class VMwriter {
         }
     }
 
-    public void writePop(Segment seg, int index) {
+    void writePop(Segment seg, int index) {
         commandB = false;
         try {
             writer.write(String.format("pop %s %d\n", seg.toString().toLowerCase(), index));
@@ -46,7 +48,7 @@ public class VMwriter {
         }
     }
 
-    public void writeArithmetic(Command command) {
+    void writeArithmetic(Command command) {
 
         try {
             writer.write(command.toString().toLowerCase() + "\n");
@@ -55,7 +57,7 @@ public class VMwriter {
         }
     }
 
-    public void writeLabel(String label) {
+    void writeLabel(String label) {
 
         try {
             writer.write(String.format("label %s\n", label));
@@ -64,7 +66,7 @@ public class VMwriter {
         }
     }
 
-    public void writeGoto(String str) {
+    void writeGoto(String str) {
 
         try {
             writer.write(String.format("goto %s\n", str));
@@ -73,7 +75,7 @@ public class VMwriter {
         }
     }
 
-    public void writeIf(String str) {
+    void writeIf(String str) {
 
         try {
             writer.write(String.format("if-goto %s\n", str));
@@ -82,7 +84,7 @@ public class VMwriter {
         }
     }
 
-    public void writeCall(String name, int nArgs) {
+    void writeCall(String name, int nArgs) {
         commandB = false;
         try {
             writer.write(String.format("call %s %d\n", name, nArgs));
@@ -91,7 +93,7 @@ public class VMwriter {
         }
     }
 
-    public void writeFunction(String name, int nLocals) {
+    void writeFunction(String name, int nLocals) {
         commandB = false;
         try {
             writer.write(String.format("function %s.%s %d\n", className, name, +nLocals));
@@ -113,7 +115,7 @@ public class VMwriter {
         }
     }
 
-    public void writeReturn(boolean isVoid) {
+    void writeReturn(boolean isVoid) {
 
         try {
             if (isVoid)
@@ -124,7 +126,7 @@ public class VMwriter {
         }
     }
 
-    public void setConstructor(int num) {
+    void setConstructor(int num) {
         commandB = false;
         constructor = true;
         fields = num;
@@ -193,13 +195,13 @@ public class VMwriter {
         }
     }
 
-    public void setPrevToken(String prev){
+    void setPrevToken(String prev) {
         prevToken[2] = prevToken[1];
         prevToken[1] = prevToken[0];
         prevToken[0] = prev;
     }
 
-    public void close() {
+    void close() {
         try {
             writer.close();
         } catch (IOException e) {
@@ -207,11 +209,11 @@ public class VMwriter {
         }
     }
 
-    public enum Segment {
+    enum Segment {
         CONSTANT, ARGUMENT, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
     }
 
-    public enum Command {
+    enum Command {
         ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT
     }
 

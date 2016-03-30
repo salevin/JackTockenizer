@@ -4,20 +4,21 @@ import java.util.Objects;
 /**
  * Created by sam on 2/25/16.
  */
-public class SymbolTable {
+class SymbolTable {
 
     private static Hashtable<String, String[]> classScope;
     private static Hashtable<String, String[]> subroutineScope;
-    public SymbolTable() {
+
+    SymbolTable() {
         classScope = new Hashtable<>();
         subroutineScope = new Hashtable<>();
     }
 
-    public void startSubroutine() {
+    void startSubroutine() {
         subroutineScope.clear();
     }
 
-    public void Define(String name, String type, Kind kind) {
+    void Define(String name, String type, Kind kind) {
         int count = 0;
         String[] kindType = new String[3];
         kindType[0] = type;
@@ -48,7 +49,7 @@ public class SymbolTable {
         }
     }
 
-    public Integer VarCount(Kind kind) {
+    Integer VarCount(Kind kind) {
         int count = 0;
         for (String key : classScope.keySet()) {
             if (Objects.equals(classScope.get(key)[1], kind.toString())) {
@@ -63,21 +64,21 @@ public class SymbolTable {
         return count;
     }
 
-    public Kind KindOf(String name) {
+    Kind KindOf(String name) {
         if (classScope.containsKey(name))
             return toKind(classScope.get(name)[1]);
         else
             return toKind(subroutineScope.get(name)[1]);
     }
 
-    public String TypeOf(String name) {
+    String TypeOf(String name) {
         if (classScope.containsKey(name))
             return classScope.get(name)[0];
         else
             return subroutineScope.get(name)[0];
     }
 
-    public int IndexOf(String name) {
+    int IndexOf(String name) {
         if (classScope.containsKey(name))
             return Integer.parseInt(classScope.get(name)[2]);
         else if (subroutineScope.containsKey(name))
@@ -86,7 +87,7 @@ public class SymbolTable {
             return -1;
     }
 
-    public Kind toKind(String stringType) {
+    Kind toKind(String stringType) {
         for (Kind kind : Kind.values()) {
             if (stringType.equalsIgnoreCase(kind.toString()))
                 return kind;
@@ -94,7 +95,7 @@ public class SymbolTable {
         return Kind.NONE;
     }
 
-    public enum Kind {
+    enum Kind {
         STATIC, FIELD, VAR, ARG, NONE
     }
 

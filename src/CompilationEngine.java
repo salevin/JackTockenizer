@@ -9,7 +9,7 @@ import static java.lang.System.exit;
 /**
  * Created by sam on 2/2/16.
  */
-public class CompilationEngine {
+class CompilationEngine {
 
     private JackTokenizer jToke;
     private BufferedWriter writer;
@@ -26,7 +26,7 @@ public class CompilationEngine {
     private int ifIndex;
     private VMwriter VMwrite;
 
-    public CompilationEngine(String inputPath, String outputPath) {
+    CompilationEngine(String inputPath, String outputPath) {
         jToke = new JackTokenizer(inputPath);
         sTable = new SymbolTable();
         prevTwo = new String[]{"", ""};
@@ -40,7 +40,7 @@ public class CompilationEngine {
         VMwrite = new VMwriter(outputPath.substring(0, outputPath.length() - 4));
     }
 
-    public void compileClass() {
+    void compileClass() {
         try {
             writer.write("<class>\n");
             JackTokenizer.keys key;
@@ -148,7 +148,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileSubroutineDec() {
+    private void compileSubroutineDec() {
         try {
             sTable.startSubroutine();
             whileIndex = ifIndex = 0;
@@ -204,7 +204,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileSubroutineBody() {
+    private void compileSubroutineBody() {
         try {
             writer.write("<subroutineBody>\n");
             writeCurrToke();
@@ -242,7 +242,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileParameterList() {
+    private void compileParameterList() {
         try {
             writer.write("<parameterList>\n");
             if (!currToke().equals(")")) {
@@ -294,7 +294,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileVarDec() {
+    private void compileVarDec() {
         try {
             writer.write("<varDec>\n");
             writeCurrToke();
@@ -316,7 +316,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileStatements() {
+    private void compileStatements() {
         try {
             writer.write("<statements>\n");
             while (!currToke().equals("}")) {
@@ -352,7 +352,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileDo() {
+    private void compileDo() {
         try {
             writer.write("<doStatement>\n");
             writeCurrToke();
@@ -378,7 +378,7 @@ public class CompilationEngine {
 
     }
 
-    public void compileLet() {
+    private void compileLet() {
         try {
             writer.write("<letStatement>\n");
 
@@ -400,7 +400,7 @@ public class CompilationEngine {
                 writeCurrToke();
                 realAdvance();
                 compileExpression();
-                VMwrite.writePush(seg,index);
+                VMwrite.writePush(seg, index);
                 VMwrite.writeArithmetic(VMwriter.Command.ADD);
                 writeCurrToke();
                 realAdvance();
@@ -432,7 +432,7 @@ public class CompilationEngine {
 
     }
 
-    public void compileWhile() {
+    private void compileWhile() {
         try {
             writer.write("<whileStatement>\n");
 
@@ -484,7 +484,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileReturn() {
+    private void compileReturn() {
         try {
             writer.write("<returnStatement>\n");
             writeCurrToke();
@@ -493,8 +493,7 @@ public class CompilationEngine {
             if (!currToke().equals(";")) {
                 compileExpression();
                 VMwrite.writeReturn(false);
-            }
-            else VMwrite.writeReturn(true);
+            } else VMwrite.writeReturn(true);
 
             writeCurrToke();
             writer.write("</returnStatement>\n");
@@ -503,7 +502,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileIf() {
+    private void compileIf() {
         try {
             writer.write("<ifStatement>\n");
             int currIndex = ifIndex;
@@ -571,7 +570,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileExpression() {
+    private void compileExpression() {
         try {
             writer.write("<expression>\n");
 
@@ -583,7 +582,7 @@ public class CompilationEngine {
                 writeCurrToke();
                 realAdvance();
                 compileTerm();
-                switch (toke){
+                switch (toke) {
                     case "*":
                         VMwrite.writeCall("Math.multiply", 2);
                         break;
@@ -605,7 +604,7 @@ public class CompilationEngine {
         }
     }
 
-    public void compileTerm() {
+    private void compileTerm() {
 
         String name;
         int args;
@@ -636,7 +635,7 @@ public class CompilationEngine {
                 default:
                     switch (jToke.tokenType()) {
                         case KEYWORD:
-                            switch (jToke.keyWord()){
+                            switch (jToke.keyWord()) {
                                 case TRUE:
                                     VMwrite.writePush(VMwriter.Segment.CONSTANT, 0);
                                     VMwrite.writeArithmetic(VMwriter.Command.NOT);
@@ -664,7 +663,7 @@ public class CompilationEngine {
                             writeCurrToke();
                             VMwrite.writePush(VMwriter.Segment.CONSTANT, currToke().length());
                             VMwrite.writeCall("String.new", 1);
-                            for(int i = 0; i<currToke().length(); i++){
+                            for (int i = 0; i < currToke().length(); i++) {
                                 VMwrite.writePush(VMwriter.Segment.CONSTANT, (int) currToke().charAt(i));
                                 VMwrite.writeCall("String.appendChar", 2);
                             }
@@ -750,7 +749,7 @@ public class CompilationEngine {
                 break;
             case ".":
                 writeCurrToke();
-                if (sTable.IndexOf(vmName) != -1){
+                if (sTable.IndexOf(vmName) != -1) {
                     VMwrite.writePush(VMwrite.toSegment(sTable.KindOf(vmName).toString()), sTable.IndexOf(vmName));
                     vmName = sTable.TypeOf(vmName);
                     vmArgs++;
@@ -786,7 +785,7 @@ public class CompilationEngine {
 
     }
 
-    public void compileExpressionList() {
+    private void compileExpressionList() {
         try {
             writer.write("<expressionList>\n");
             if (!currToke().equals(")")) {

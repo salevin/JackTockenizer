@@ -5,7 +5,7 @@ import java.io.PushbackReader;
 /**
  * Created by sam on 2/2/16.
  */
-public class JackTokenizer {
+class JackTokenizer {
 
     private PushbackReader rd;
 
@@ -15,7 +15,7 @@ public class JackTokenizer {
 
     private keys curr_keyWord;
 
-    public JackTokenizer(String inputFile) {
+    JackTokenizer(String inputFile) {
         try {
             rd = new PushbackReader(
                     new FileReader(inputFile));
@@ -24,7 +24,7 @@ public class JackTokenizer {
         }
     }
 
-    public boolean hasMoreTokens() {
+    boolean hasMoreTokens() {
         try {
             int curr_char = rd.read();
             if (curr_char != -1 && !Character.isWhitespace(curr_char)) {
@@ -38,7 +38,7 @@ public class JackTokenizer {
         }
     }
 
-    public void advance() {
+    void advance() {
         try {
             char curr_char = (char) rd.read();
 
@@ -90,15 +90,15 @@ public class JackTokenizer {
         }
     }
 
-    public types tokenType() {
+    types tokenType() {
         return curr_tokenType;
     }
 
-    public keys keyWord() {
+    keys keyWord() {
         return curr_keyWord;
     }
 
-    public String advanceDigit(String num) {
+    private String advanceDigit(String num) {
         try {
             char curr_char = (char) rd.read();
             if (Character.isDigit(curr_char)) {
@@ -113,7 +113,7 @@ public class JackTokenizer {
         }
     }
 
-    public String advanceLetter(String letter) {
+    private String advanceLetter(String letter) {
         try {
             char curr_char = (char) rd.read();
             if (Character.isLetterOrDigit(curr_char) || curr_char == '_') {
@@ -128,7 +128,7 @@ public class JackTokenizer {
         }
     }
 
-    public String advanceString(String token) {
+    private String advanceString(String token) {
         try {
             char curr_char = (char) rd.read();
             while (curr_char != '"') {
@@ -142,11 +142,11 @@ public class JackTokenizer {
         }
     }
 
-    public String returnToken() {
+    String returnToken() {
         return token;
     }
 
-    public void keyIdSwitch() {
+    private void keyIdSwitch() {
         curr_tokenType = types.KEYWORD;
         switch (token) {
             case "class":
@@ -219,7 +219,7 @@ public class JackTokenizer {
 
     }
 
-    public void advanceComment() {
+    private void advanceComment() {
         try {
             curr_tokenType = types.COMMENT;
             char curr_char = (char) rd.read();
@@ -233,7 +233,7 @@ public class JackTokenizer {
         }
     }
 
-    public void advanceBlock() {
+    private void advanceBlock() {
         try {
             curr_tokenType = types.COMMENT;
             char next_char = ' ';
@@ -247,12 +247,12 @@ public class JackTokenizer {
         }
     }
 
-    public enum types {
+    enum types {
         KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, COMMENT
     }
 
 
-    public enum keys {
+    enum keys {
         CLASS, METHOD, FUNCTION, CONSTRUCTOR, INT, BOOLEAN, CHAR, VOID, VAR, STATIC, FIELD, LET,
         DO, IF, ELSE, WHILE, RETURN, TRUE, FALSE, NULL, THIS
     }
