@@ -1,5 +1,3 @@
-import sun.misc.VM;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,7 +5,6 @@ import java.io.OutputStreamWriter;
 
 import static java.lang.System.err;
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 /**
  * Created by sam on 2/2/16.
@@ -397,9 +394,14 @@ public class CompilationEngine {
             realAdvance();
 
             if (currToke().equals("[")) {
+                VMwriter.Segment seg =
+                        VMwrite.toSegment(sTable.KindOf(pop).toString());
+                int index = sTable.IndexOf(pop);
                 writeCurrToke();
                 realAdvance();
                 compileExpression();
+                VMwrite.writePush(seg,index);
+                VMwrite.writeArithmetic(VMwriter.Command.ADD);
                 writeCurrToke();
                 realAdvance();
             }
@@ -677,9 +679,14 @@ public class CompilationEngine {
                             // Remember that you have to save the token
                             if (currToke().equals("[")) {
                                 writeSavedToke();
+                                VMwriter.Segment seg =
+                                        VMwrite.toSegment(sTable.KindOf(name).toString());
+                                int index = sTable.IndexOf(name);
                                 writeCurrToke();
                                 realAdvance();
                                 compileExpression();
+                                VMwrite.writePush(seg, index);
+                                VMwrite.writeArithmetic(VMwriter.Command.ADD);
                                 if (!currToke().equals("]")) {
                                     err.println("incorrect format! in compileTerm()");
                                     exit(0);
