@@ -930,8 +930,9 @@ class CompilationEngine {
                             VMwrite.setConstructor(sTable.VarCount(sTable.toKind("FIELD")));
                             funcName = name;
                             return;
-                        case "method":
                         case "function":
+                            VMwrite.setFunction();
+                        case "method":
                             funcName = name;
                             name = "this";
                             sTable.Define(name, className, SymbolTable.Kind.ARG);

@@ -14,6 +14,7 @@ class VMwriter {
     private BufferedWriter writer;
     private String className;
     private boolean constructor;
+    private boolean function;
     private int fields;
     private boolean commandB;
     private String[] prevToken = {"", "", ""};
@@ -28,6 +29,7 @@ class VMwriter {
         className = outputPath.substring(outputPath.lastIndexOf("/") + 1, outputPath.length());
         constructor = false;
         commandB = false;
+        function = false;
     }
 
     void writePush(Segment seg, int index) {
@@ -105,9 +107,14 @@ class VMwriter {
             if (constructor) {
                 writer.write(String.format("push constant %d\ncall Memory.alloc 1\n", fields));
                 constructor = false;
-            } else {
-                writer.write("push argument 0\n");
             }
+
+            else if (function){
+                function = false;
+                return;
+            }
+
+            else writer.write("push argument 0\n");
             writer.write("pop pointer 0\n");
 
         } catch (IOException e) {
@@ -130,6 +137,11 @@ class VMwriter {
         commandB = false;
         constructor = true;
         fields = num;
+    }
+
+    void setFunction () {
+        commandB = false;
+        function = true;
     }
 
     Segment toSegment(String seg) {
