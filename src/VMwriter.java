@@ -110,6 +110,7 @@ class VMwriter {
             }
 
             else if (function){
+                constructor = false;
                 function = false;
                 return;
             }
@@ -148,7 +149,6 @@ class VMwriter {
 
         switch (seg) {
             case "FIELD":
-            case "STATIC":
                 return Segment.THIS;
             case "VAR":
                 return Segment.LOCAL;
@@ -158,7 +158,7 @@ class VMwriter {
                 return Segment.ARGUMENT;
             case "method":
                 return Segment.POINTER;
-            case "Ed":
+            case "STATIC":
                 return Segment.STATIC;
             case "static":
                 return Segment.TEMP;
@@ -181,7 +181,7 @@ class VMwriter {
                 commandB = true;
                 return Command.GT;
             case "-":
-                if (commandB || "{([,&|<>=~".contains(prevToken[2])) {
+                if (commandB || "{([,&|<>=~,".contains(prevToken[2])) {
                     return Command.NEG;
                 }
                 commandB = true;

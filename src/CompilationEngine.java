@@ -697,10 +697,6 @@ class CompilationEngine {
                                 vmArgs = args;
                                 vmName = name;
                                 compileSubroutineCall(true);
-                                int index = sTable.IndexOf(orignialName);
-                                if (index != -1) {
-                                    VMwrite.writePush(VMwrite.toSegment(sTable.KindOf(orignialName).toString()), index);
-                                }
                                 VMwrite.writeCall(vmName, vmArgs);
                             } else {
                                 writeSavedToke();
@@ -932,6 +928,8 @@ class CompilationEngine {
                             return;
                         case "function":
                             VMwrite.setFunction();
+                            funcName = name;
+                            return;
                         case "method":
                             funcName = name;
                             name = "this";
