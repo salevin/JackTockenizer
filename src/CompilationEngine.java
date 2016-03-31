@@ -111,7 +111,7 @@ class CompilationEngine {
         }
     }
 
-    public void compileClassVarDec() {
+    private void compileClassVarDec() {
         try {
             writer.write("<classVarDec>\n");
             writeCurrToke();
